@@ -1,0 +1,48 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  background-color: #1a1a1; /* Dark background for particle visibility */
+  color: #ffffff; /* White text for contrast */
+  position: relative;
+  z-index: 1; /* Ensure content is above particles */
+  overflow: auto;
+}
+
+.title {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+
+.description {
+  font-size: 1.2rem;
+  max-width: 300px;
+  margin-bottom: 30px;
+  color: #cccccc; /* Light gray for readability */
+}
+
+.buttonContainer {
+  display: flex;
+  gap: 20px;
+}
+
+.button {
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background-color: #005bb5;
+}

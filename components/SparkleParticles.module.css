@@ -1,0 +1,39 @@
+/* SparkleParticles.module.css */
+.particleContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.sparkleParticle {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  filter: blur(var(--blur));
+  left: var(--start-x);
+  top: var(--start-y);
+  width: var(--size);
+  height: var(--size);
+  animation-name: float;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(var(--move-x), var(--move-y));
+    opacity: 0.4;
+  }
+  100% {
+    transform: translate(calc(var(--move-x) * -1), calc(var(--move-y) * -1));
+    opacity: 0.8;
+  }
+}

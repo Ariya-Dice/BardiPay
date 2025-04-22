@@ -1,0 +1,48 @@
+// pages/buyer.tsx
+'use client';
+
+import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
+import { QRScanner } from '../components/QRScanner';
+import SparkleParticles from '../components/SparkleParticles';
+import styles from './Buyer.module.css';
+
+export interface PaymentInfo {
+  amount: string;
+  token: string;
+  network: string;
+  recipient: string;
+  invoiceId: string;
+}
+
+const WalletConnection = dynamic<
+  { paymentInfo: PaymentInfo }
+>(() => import('../modules/walletConnection'), {
+  ssr: false,
+  loading: () => <p>Loading wallet connection...</p>,
+});
+
+export default function Buyer() {
+  const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
+
+  return (
+    <div className={styles.container}>
+      <SparkleParticles />
+      <h1 className={styles.title}>Customer Payment</h1>
+
+      <QRScanner onScanComplete={setPaymentInfo} />
+
+      {paymentInfo && (
+        <div className={styles.paymentDetails}>
+          <h3>Payment Details</h3>
+          <p>Amount: {paymentInfo.amount} {paymentInfo.token}</p>
+          <p>Network: {paymentInfo.network}</p>
+          <p>Recipient: {paymentInfo.recipient}</p>
+          <p>Invoice ID: {paymentInfo.invoiceId}</p>
+        </div>
+      )}
+
+      {paymentInfo && <WalletConnection paymentInfo={paymentInfo} />}
+    </div>
+  );
+}
