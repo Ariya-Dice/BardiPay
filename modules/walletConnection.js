@@ -7,23 +7,50 @@ import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } f
 import { getOrCreateAssociatedTokenAccount, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { createTransaction } from './transactionCreator';
 import dynamic from 'next/dynamic';
+import styles from '../pages/Buyer.module.css';
 
-// Dynamically import tronweb to avoid SSR issues
 const TronWeb = dynamic(() => import('tronweb'), { ssr: false });
 
 const WalletConnection = ({ paymentInfo }) => {
   const [account, setAccount] = useState(null);
   const [error, setError] = useState(null);
   const [txStatus, setTxStatus] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleError = (error, customMessage = 'Error connecting to wallet') => {
-    let errorMessage = customMessage;
-    if (error.code === 4001) errorMessage = 'You rejected the connection request';
-    else if (error.code === -32002) errorMessage = 'A connection request is already pending';
-    else if (error.message?.includes('No provider found')) errorMessage = 'No wallet detected. Please install a compatible wallet.';
-    else errorMessage = error.message || 'An unexpected error occurred';
+  const handleError = (error) => {
+    let errorMessage = 'Error processing transaction';
+    if (error.message.includes('Insufficient funds')) {
+      errorMessage = 'Insufficient funds in your account. Please top up your account.';
+    } else if (error.message.includes('Insufficient token balance')) {
+      errorMessage = 'Insufficient token balance. Please top up your token balance.';
+    } else if (error.message.includes('You rejected the transaction')) {
+      errorMessage = 'You rejected the transaction.';
+    } else if (error.message.includes('Failed to estimate gas')) {
+      errorMessage = 'Failed to estimate gas. Please try again or check your wallet.';
+    } else if (error.code === 'NETWORK_ERROR') {
+      errorMessage = `Incorrect network. Please switch to ${paymentInfo?.network === 'bsc' ? 'BSC' : 'Ethereum'}.`;
+    } else if (error.code === 4001) {
+      errorMessage = 'You rejected the connection request.';
+    } else if (error.code === -32002) {
+      errorMessage = 'A connection request is already pending.';
+    } else if (error.message.includes('MetaMask not found')) {
+      errorMessage = 'Wallet not found. Please install MetaMask.';
+    } else if (error.message.includes('Invalid recipient address')) {
+      errorMessage = 'Invalid recipient address.';
+    } else if (error.message.includes('Invalid amount')) {
+      errorMessage = 'Invalid amount entered.';
+    } else if (error.message.includes('not supported')) {
+      errorMessage = `Network or token not supported: ${error.message}`;
+    } else if (error.message.includes('TronLink')) {
+      errorMessage = 'Please install TronLink to proceed.';
+    } else if (error.message.includes('Phantom')) {
+      errorMessage = 'Please install Phantom to proceed.';
+    } else {
+      errorMessage = `Unexpected error: ${error.message}`;
+    }
     setError(errorMessage);
-    console.error('Error:', { code: error.code, message: error.message, stack: error.stack });
+    console.error('Error:', error);
+    return errorMessage;
   };
 
   const switchNetwork = async (provider, chainId) => {
@@ -66,7 +93,7 @@ const WalletConnection = ({ paymentInfo }) => {
       const account = tronWeb.defaultAddress.base58;
       return { tronWeb, account };
     } else {
-      throw new Error('Please install TronLink and log in.');
+      throw new Error('Please install TronLink.');
     }
   };
 
@@ -95,7 +122,7 @@ const WalletConnection = ({ paymentInfo }) => {
       const account = window.solana.publicKey.toString();
       return { solana: window.solana, account };
     } else {
-      throw new Error('Please install Phantom and log in.');
+      throw new Error('Please install Phantom.');
     }
   };
 
@@ -142,29 +169,28 @@ const WalletConnection = ({ paymentInfo }) => {
 
     setError(null);
     setTxStatus(null);
+    setIsLoading(true);
 
     try {
       const { network, chainId, amount, recipient, token, invoiceId, contractAddress } = paymentInfo;
 
       if (network === 'bitcoin') {
-        setTxStatus(
-          `Please send ${amount} BTC to address ${recipient}. Invoice ID: ${invoiceId}`
-        );
+        setTxStatus(`Please send ${amount} BTC to address ${recipient}. Invoice ID: ${invoiceId}`);
         return;
       } else if (network === 'ethereum' || network === 'bsc') {
         const provider = await detectEthereumProvider();
         if (!provider || !provider.isMetaMask) {
-          throw new Error('MetaMask not detected. Please install MetaMask.');
+          throw new Error('MetaMask not found. Please install MetaMask.');
         }
 
-        const ethersProvider = new ethers.BrowserProvider(provider);
-
-        if (chainId) {
+        const ethersProvider = new ethers.providers.Web3Provider(provider);
+        const currentNetwork = await ethersProvider.getNetwork();
+        if (currentNetwork.chainId !== chainId) {
           await switchNetwork(provider, chainId);
         }
 
         const accounts = await provider.request({ method: 'eth_requestAccounts' });
-        const signer = await ethersProvider.getSigner();
+        const signer = ethersProvider.getSigner();
         setAccount(accounts[0]);
 
         const result = await createTransaction(signer, paymentInfo);
@@ -183,19 +209,36 @@ const WalletConnection = ({ paymentInfo }) => {
         throw new Error('Network not supported.');
       }
     } catch (error) {
-      handleError(error, 'Error connecting or processing transaction');
+      handleError(error);
+    } finally {
+      setIsLoading(false);
     }
   }, [paymentInfo]);
 
   return (
-    <div style={{ padding: '20px', textAlign: 'center' }}>
-      <button onClick={connectWallet} style={{ padding: '10px 20px', cursor: 'pointer' }}>
-        {account
-          ? `Connected: ${account.substring(0, 6)}...${account.substring(account.length - 4)}`
-          : 'Connect Wallet'}
+    <div className={styles.walletContainer}>
+      <button 
+        onClick={connectWallet} 
+        className={styles.connectButton}
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          'We Working On It...'
+        ) : account ? (
+          `Connected: ${account.substring(0, 6)}...${account.substring(account.length - 4)}`
+        ) : (
+          'Please Connect Wallet and Pay'
+        )}
       </button>
-      {error && <p style={{ color: 'red', marginTop: '10px' }}>{error}</p>}
-      {txStatus && <p style={{ color: 'green', marginTop: '10px' }}>{txStatus}</p>}
+      
+      {isLoading && (
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingSpinner}></div>
+        </div>
+      )}
+
+      {error && <p className={styles.errorMessage}>{error}</p>}
+      {txStatus && <p className={styles.successMessage}>{txStatus}</p>}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 // pages/buyer.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Component } from 'react';
 import dynamic from 'next/dynamic';
 import { QRScanner } from '../components/QRScanner';
 import SparkleParticles from '../components/SparkleParticles';
@@ -21,6 +21,21 @@ const WalletConnection = dynamic<
   ssr: false,
   loading: () => <p>Loading wallet connection...</p>,
 });
+
+class ErrorBoundary extends Component {
+  state = { hasError: false, errorMessage: '' };
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, errorMessage: error.message };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <p className={styles.errorMessage}>Error: {this.state.errorMessage}</p>;
+    }
+    return this.props.children;
+  }
+}
 
 export default function Buyer() {
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
@@ -42,7 +57,11 @@ export default function Buyer() {
         </div>
       )}
 
-      {paymentInfo && <WalletConnection paymentInfo={paymentInfo} />}
+      {paymentInfo && (
+        <ErrorBoundary>
+          <WalletConnection paymentInfo={paymentInfo} />
+        </ErrorBoundary>
+      )}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 
 export const createTransaction = async (signer, paymentInfo) => {
-  const { recipient, amount, token, invoiceId, network } = paymentInfo;
+  const { recipient, amount, token, network } = paymentInfo;
 
   const tokenConfigs = {
     ethereum: {
@@ -19,50 +19,93 @@ export const createTransaction = async (signer, paymentInfo) => {
   };
 
   try {
-    let tx;
-    const nativeTokens = ['ETH', 'BNB'];
-
-    if (nativeTokens.includes(token)) {
-      // Convert amount to string to ensure compatibility with parseEther
-      const amountStr = typeof amount === 'string' ? amount : amount.toString();
-
-      // Validate amount
-      if (!amountStr || isNaN(parseFloat(amountStr)) || parseFloat(amountStr) <= 0) {
-        throw new Error('Invalid amount for native token transaction');
-      }
-
-      const data = ethers.hexlify(ethers.toUtf8Bytes(invoiceId || ''));
-      tx = await signer.sendTransaction({
-        to: recipient,
-        value: ethers.parseEther(amountStr),
-        data,
-      });
-    } else {
-      const tokenConfig = tokenConfigs[network]?.[token];
-      if (!tokenConfig) {
-        throw new Error(`${token} is not supported on ${network}`);
-      }
-
-      // Convert amount to string for parseUnits
-      const amountStr = typeof amount === 'string' ? amount : amount.toString();
-
-      // Validate amount
-      if (!amountStr || isNaN(parseFloat(amountStr)) || parseFloat(amountStr) <= 0) {
-        throw new Error('Invalid amount for token transaction');
-      }
-
-      const tokenContract = new ethers.Contract(
-        tokenConfig.address,
-        ['function transfer(address to, uint256 amount) returns (bool)'],
-        signer
-      );
-      tx = await tokenContract.transfer(recipient, ethers.parseUnits(amountStr, tokenConfig.decimals));
+    // Initial validation
+    if (!ethers.utils.isAddress(recipient)) {
+      throw new Error('Invalid recipient address');
     }
 
-    const receipt = await tx.wait();
-    return receipt;
+    if (isNaN(amount) || amount <= 0) {
+      throw new Error('Invalid amount entered');
+    }
+
+    const nativeTokens = ['ETH', 'BNB'];
+    const isNativeToken = nativeTokens.includes(token);
+
+    // Handle native tokens (ETH/BNB)
+    if (isNativeToken) {
+      const value = ethers.utils.parseEther(amount.toString());
+
+      // Check balance
+      const balance = await signer.getBalance();
+      if (balance.lt(value)) {
+        throw new Error('Insufficient funds');
+      }
+
+      // Estimate gas with 20% buffer
+      try {
+        const gasEstimate = await signer.estimateGas({
+          to: recipient,
+          value,
+        });
+
+        const tx = await signer.sendTransaction({
+          to: recipient,
+          value,
+          gasLimit: gasEstimate.mul(120).div(100),
+        });
+
+        return tx.wait();
+      } catch (gasError) {
+        if (gasError.code === 'INSUFFICIENT_FUNDS' || gasError.message.includes('insufficient funds')) {
+          throw new Error('Insufficient funds for gas');
+        }
+        if (gasError.code === 'ACTION_REJECTED') {
+          throw new Error('You rejected the transaction');
+        }
+        throw new Error('Failed to estimate gas');
+      }
+    }
+
+    // Handle ERC20 tokens
+    const tokenConfig = tokenConfigs[network]?.[token];
+    if (!tokenConfig) {
+      throw new Error(`${token} is not supported on ${network} network`);
+    }
+
+    const contract = new ethers.Contract(
+      tokenConfig.address,
+      ['function transfer(address,uint256)', 'function balanceOf(address)'],
+      signer
+    );
+
+    // Check token balance
+    const decimals = tokenConfig.decimals;
+    const parsedAmount = ethers.utils.parseUnits(amount.toString(), decimals);
+    const balance = await contract.balanceOf(await signer.getAddress());
+
+    if (balance.lt(parsedAmount)) {
+      throw new Error('Insufficient token balance');
+    }
+
+    // Estimate gas with 20% buffer
+    try {
+      const gasEstimate = await contract.estimateGas.transfer(recipient, parsedAmount);
+
+      const tx = await contract.transfer(recipient, parsedAmount, {
+        gasLimit: gasEstimate.mul(120).div(100),
+      });
+
+      return tx.wait();
+    } catch (gasError) {
+      if (gasError.code === 'INSUFFICIENT_FUNDS' || gasError.message.includes('insufficient funds')) {
+        throw new Error('Insufficient funds for gas');
+      }
+      if (gasError.code === 'ACTION_REJECTED') {
+        throw new Error('You rejected the transaction');
+      }
+      throw new Error('Failed to estimate gas for token transfer');
+    }
   } catch (error) {
-    console.error('Error creating transaction:', error);
-    throw new Error(`Failed to create transaction: ${error.message}`);
+    throw error; // Pass the error as-is to WalletConnection for handling
   }
 };
