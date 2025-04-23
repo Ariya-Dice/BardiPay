@@ -1,239 +1,212 @@
+/* حفظ شفافیت برای کانتینر اصلی */
 .container {
   padding: 20px;
   text-align: center;
-  font-family: Arial, sans-serif;
+  font-family: 'Arial', sans-serif;
   position: relative;
   min-height: 100vh;
-  background-color: #1a1a1; /* Dark background for particle visibility */
-  color: #ffffff; /* White text for contrast */
+  background: transparent; /* پس‌زمینه شفاف */
+  color: #ffffff;
   overflow: auto;
 }
 
+/* حفظ z-index برای محتوا */
 .content {
   position: relative;
-  z-index: 1; /* Ensure content is above particles */
+  z-index: 1; /* بالای پارتیکل‌ها */
   max-width: 1200px;
   margin: 0 auto;
-}
-
-.title {
-  font-size: 2rem;
-  margin-bottom: 20px;
-  color: #ffffff;
-}
-
-.walletSection {
-  margin: 20px auto;
-  max-width: 600px;
-  background-color: #2a2a2a; /* Slightly lighter dark for contrast */
   padding: 20px;
-  border-radius: 8px;
 }
 
-.walletSectionTitle {
-  font-size: 1.5rem;
-  margin-bottom: 15px;
-  color: #ffffff;
-}
-
-.walletInputContainer {
-  margin: 10px 0;
-}
-
-.walletLabel {
-  margin-right: 10px;
-  font-weight: 500;
-  color: #cccccc; /* Light gray for readability */
-}
-
-.walletInput {
-  padding: 5px;
-  width: 300px;
-  border: 1px solid #444444;
-  border-radius: 4px;
-  font-size: 1rem;
-  background-color: #333333;
-  color: #ffffff;
-}
-
-.formSection {
-  margin: 20px 0;
-}
-
-.formLabel {
-  margin-right: 10px;
-  font-weight: 500;
-  color: #cccccc;
-}
-
-.amountInput {
-  padding: 5px;
-  width: 100px;
-  border: 1px solid #444444;
-  border-radius: 4px;
-  font-size: 1rem;
-  background-color: #333333;
-  color: #ffffff;
-}
-
-.currencySelect {
-  padding: 5px;
-  width: 200px;
-  border: 1px solid #444444;
-  border-radius: 4px;
-  font-size: 1rem;
-  background-color: #333333;
-  color: #ffffff;
-}
-
-.submitButton {
-  padding: 10px 20px;
-  cursor: pointer;
-  background-color: #0070f3;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: background-color 0.2s;
-}
-
-.submitButton:hover {
-  background-color: #005bb5;
-}
-
-.resultSection {
-  margin: 20px auto;
-  max-width: 400px;
-  background-color: #2a2a2a;
-  padding: 20px;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.resultTitle {
-  font-size: 1.5rem;
-  margin-bottom: 15px;
-  color: #ffffff;
-}
-
-.resultText {
-  margin: 5px 0;
-  font-size: 1rem;
-  color: #cccccc;
-}
-
-.qrCodeImage {
-  max-width: 200px;
-  margin-top: 10px;
-}
-
-.eventLogSection {
-  margin: 20px auto;
-  max-width: 600px;
-  background-color: #2a2a2a;
-  padding: 20px;
-  border-radius: 8px;
-}
-
-.eventLogTitle {
-  font-size: 1.5rem;
-  margin-bottom: 15px;
-  color: #ffffff;
-}
-
-.eventList {
-  list-style: none;
-  padding: 0;
-}
-
-.eventItem {
-  border: 1px solid #444444;
-  margin: 10px 0;
-  padding: 10px;
-  border-radius: 4px;
-}
-
-.eventText {
-  margin: 5px 0;
-  font-size: 1rem;
-  color: #cccccc;
-}
-
-.eventLink {
-  color: #0070f3;
-  text-decoration: none;
-}
-
-.eventLink:hover {
-  text-decoration: underline;
-}
-
+/* شفاف‌سازی کانتینرهای بخش‌ها */
+.walletSection,
+.formSection,
+.resultSection,
+.eventLogSection,
 .searchSection {
   margin: 20px auto;
   max-width: 400px;
-  background-color: #2a2a2a;
+  background: transparent; /* پس‌زمینه شفاف */
   padding: 20px;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* حفظ سایه برای عمق */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* حفظ افکت hover */
+.walletSection:hover,
+.formSection:hover,
+.resultSection:hover,
+.eventLogSection:hover,
+.searchSection:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* حفظ استایل عنوان‌ها */
+.walletSectionTitle,
+.resultTitle,
+.eventLogTitle,
 .searchTitle {
   font-size: 1.5rem;
   margin-bottom: 15px;
   color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.searchForm {
+/* اصلاح تراز و فاصله‌گذاری برای walletInputContainer */
+.walletInputContainer {
+  margin: 15px 0; /* افزایش فاصله عمودی */
   display: flex;
-  align-items: center;
+  flex-direction: column; /* عمودی کردن برای نظم بیشتر */
+  align-items: flex-start; /* تراز به سمت چپ */
   gap: 10px;
 }
 
+/* اصلاح تراز لیبل‌ها و آیکون‌ها */
+.walletLabel {
+  font-weight: 500;
+  color: #cccccc;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* فاصله بین آیکون و متن */
+  width: 100%; /* عرض کامل برای نظم */
+}
+
+/* شفاف‌سازی فیلدهای ورودی */
+.walletInput,
+.amountInput,
+.currencySelect,
 .searchInput {
-  padding: 5px;
-  width: 200px;
-  border: 1px solid #444444;
-  border-radius: 4px;
+  padding: 8px;
+  border: 1px solid #555555;
+  border-radius: 6px;
   font-size: 1rem;
-  background-color: #333333;
+  background: transparent; /* پس‌زمینه شفاف */
   color: #ffffff;
+  width: 100%; /* عرض کامل برای یکنواختی */
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
 }
 
+/* حفظ استایل فوکوس */
+.walletInput:focus,
+.amountInput:focus,
+.currencySelect:focus,
+.searchInput:focus {
+  border-color: #0070f3;
+  background: transparent;
+  outline: none;
+}
+
+/* تنظیم عرض برای amountInput */
+.amountInput {
+  width: 100%; /* عرض کامل برای نظم */
+  max-width: 200px; /* محدود کردن عرض */
+}
+
+/* تنظیم عرض برای currencySelect */
+.currencySelect {
+  width: 100%; /* عرض کامل */
+  max-width: 220px; /* محدود کردن عرض */
+}
+
+/* استایل دکمه‌ها */
+.submitButton,
 .searchButton {
-  padding: 5px 10px;
+  padding: 10px 20px;
   cursor: pointer;
-  background-color: #0070f3;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: background-color 0.2s;
-}
-
-.searchButton:hover {
-  background-color: #005bb5;
-}
-
-.searchResultSection {
-  margin: 20px auto;
-  max-width: 400px;
-  background-color: #2a2a2a;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.searchResultTitle {
-  font-size: 1.25rem;
-  margin-bottom: 10px;
+  background: linear-gradient(135deg, #0070f3 0%, #005bb5 100%); /* حفظ گرادیان */
   color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-top: 10px; /* فاصله از فیلدها */
 }
 
+/* حفظ افکت hover برای دکمه‌ها */
+.submitButton:hover,
+.searchButton:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0, 112, 243, 0.4);
+}
+
+.submitButton:disabled {
+  background: #555555;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* اصلاح بخش نتیجه */
+.resultSection {
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent; /* پس‌زمینه شفاف */
+}
+
+/* شفاف‌سازی آیتم‌های لیست */
+.eventItem {
+  border: 1px solid #555555;
+  margin: 10px 0;
+  padding: 15px;
+  border-radius: 6px;
+  background: transparent; /* پس‌زمینه شفاف */
+}
+
+/* اصلاح فرم جستجو */
+.searchForm {
+  display: flex;
+  flex-direction: column; /* عمودی کردن برای نظم */
+  align-items: flex-start; /* تراز به چپ */
+  gap: 10px;
+}
+
+/* استایل پیام خطا */
 .errorMessage {
   color: #ff5555;
-  margin-top: 20px;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  margin-left: 0.5rem;
+}
+
+/* استایل منوی آبشاری */
+.currencySelect {
+  padding: 8px;
+  border: 1px solid #555555;
+  border-radius: 6px;
   font-size: 1rem;
+  background: #1a1a1a; /* پس‌زمینه سیاه تیره */
+  color: #ffffff; /* متن سفید برای خوانایی */
+  width: 100%;
+  max-width: 220px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+  -webkit-appearance: none; /* حذف استایل پیش‌فرض مرورگر */
+  -moz-appearance: none;
+  appearance: none; /* برای سازگاری با مرورگرهای مختلف */
+}
+
+/* استایل حالت فوکوس */
+.currencySelect:focus {
+  border-color: #0070f3;
+  background: #1a1a1a; /* حفظ پس‌زمینه سیاه در فوکوس */
+  outline: none;
+}
+
+/* استایل گزینه‌های منوی آبشاری */
+.currencySelect option {
+  background: #1a1a1a; /* پس‌زمینه سیاه برای گزینه‌ها */
+  color: #ffffff; /* متن سفید برای گزینه‌ها */
+  font-size: 1rem;
+}
+
+/* برای اطمینان از خوانایی placeholder یا متن انتخاب‌شده */
+.currencySelect::placeholder {
+  color: #cccccc; /* رنگ خاکستری روشن برای placeholder */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }

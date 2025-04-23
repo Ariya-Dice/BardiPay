@@ -1,9 +1,9 @@
 'use client';
 
-
 import SparkleParticles from '../components/SparkleParticles';
 import styles from './Home.module.css';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Home() {
   return (
@@ -16,10 +16,28 @@ export default function Home() {
         </p>
         <div className={styles.buttonContainer}>
           <Link href="/buyer">
-            <button className={styles.button}>I’m Buyer</button>
+            <button className={styles.button}>
+              <Image
+                src="/buyer.png"
+                alt="Buyer Icon"
+                width={64} /* افزایش اندازه آیکون */
+                height={64}
+                className={styles.buttonIcon}
+              />
+              I’m Buyer
+            </button>
           </Link>
           <Link href="/merchant">
-            <button className={styles.button}>I’m Seller</button>
+            <button className={styles.button}>
+              <Image
+                src="/seller.png"
+                alt="Seller Icon"
+                width={64} /* افزایش اندازه آیکون */
+                height={64}
+                className={styles.buttonIcon}
+              />
+              I’m Seller
+            </button>
           </Link>
         </div>
       </div>
