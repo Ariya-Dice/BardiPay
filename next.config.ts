@@ -1,8 +1,11 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactStrictMode: false,
+  output: 'export', // برای خروجی استاتیک
+  images: {
+    unoptimized: true, // غیرفعال کردن بهینه‌سازی تصاویر
+  },
 };
 
 export default nextConfig;

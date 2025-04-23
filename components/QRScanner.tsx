@@ -3,9 +3,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
+import { PaymentInfo } from '../pages/buyer'; // ایمپورت اینترفیس PaymentInfo
 
 export interface QRScannerProps {
-  onScanComplete: (data: any) => void;
+  onScanComplete: (data: PaymentInfo) => void; // اصلاح نوع داده
 }
 
 export const QRScanner: React.FC<QRScannerProps> = ({ onScanComplete }) => {
@@ -21,7 +22,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScanComplete }) => {
     qrScanner.render(
       (data) => {
         try {
-          const paymentInfo = JSON.parse(data);
+          const paymentInfo: PaymentInfo = JSON.parse(data); // افزودن نوع صریح
           onScanComplete(paymentInfo);
         } catch {
           setError('Error processing QR Code');

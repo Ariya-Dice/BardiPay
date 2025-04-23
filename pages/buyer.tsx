@@ -1,7 +1,7 @@
 // pages/buyer.tsx
 'use client';
 
-import React, { useState, Component } from 'react';
+import { useState, Component, ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { QRScanner } from '../components/QRScanner';
 import SparkleParticles from '../components/SparkleParticles';
@@ -15,24 +15,45 @@ export interface PaymentInfo {
   invoiceId: string;
 }
 
-const WalletConnection = dynamic<
-  { paymentInfo: PaymentInfo }
->(() => import('../modules/walletConnection'), {
-  ssr: false,
-  loading: () => <p>Loading wallet connection...</p>,
-});
+const WalletConnection = dynamic<{ paymentInfo: PaymentInfo }>(
+  () => import('../modules/walletConnection'),
+  {
+    ssr: false,
+    loading: () => <p>Loading wallet connection...</p>,
+  }
+);
 
-class ErrorBoundary extends Component {
-  state = { hasError: false, errorMessage: '' };
+interface ErrorBoundaryState {
+  hasError: boolean;
+  errorMessage: string;
+}
 
-  static getDerivedStateFromError(error) {
-    return { hasError: true, errorMessage: error.message };
+interface ErrorBoundaryProps {
+  children: ReactNode;
+}
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  state: ErrorBoundaryState = {
+    hasError: false,
+    errorMessage: '',
+  };
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return {
+      hasError: true,
+      errorMessage: error.message,
+    };
   }
 
   render() {
     if (this.state.hasError) {
-      return <p className={styles.errorMessage}>Error: {this.state.errorMessage}</p>;
+      return (
+        <p className={styles.errorMessage}>
+          Error: {this.state.errorMessage}
+        </p>
+      );
     }
+
     return this.props.children;
   }
 }
@@ -50,7 +71,9 @@ export default function Buyer() {
       {paymentInfo && (
         <div className={styles.paymentDetails}>
           <h3>Payment Details</h3>
-          <p>Amount: {paymentInfo.amount} {paymentInfo.token}</p>
+          <p>
+            Amount: {paymentInfo.amount} {paymentInfo.token}
+          </p>
           <p>Network: {paymentInfo.network}</p>
           <p>Recipient: {paymentInfo.recipient}</p>
           <p>Invoice ID: {paymentInfo.invoiceId}</p>

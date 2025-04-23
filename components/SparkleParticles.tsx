@@ -3,23 +3,35 @@
 import { useEffect, useState } from 'react';
 import styles from './SparkleParticles.module.css';
 
+type Particle = {
+  id: number;
+  startX: number;
+  startY: number;
+  size: number;
+  moveX: number;
+  moveY: number;
+  animationDelay: number;
+  animationDuration: number;
+  blur: number;
+};
+
 const SparkleParticles = () => {
-  const [particles, setParticles] = useState([]);
+  const [particles, setParticles] = useState<Particle[]>([]);
 
   useEffect(() => {
-    const generateParticle = () => ({
+    const generateParticle = (): Particle => ({
       id: Math.random(),
-      startX: Math.random() * 100, // موقعیت اولیه X
-      startY: Math.random() * 100, // موقعیت اولیه Y
-      size: Math.random() * 3 + 2, // اندازه بین 2 تا 5 پیکسل
-      moveX: (Math.random() - 0.5) * 2, // حرکت افقی تصادفی
-      moveY: (Math.random() - 0.5) * 2, // حرکت عمودی تصادفی
-      animationDelay: Math.random() * 5, // تاخیر انیمیشن
-      animationDuration: Math.random() * 10 + 5, // مدت زمان انیمیشن
-      blur: Math.random() * 3 // میزان محو شدگی
+      startX: Math.random() * 100,
+      startY: Math.random() * 100,
+      size: Math.random() * 3 + 2,
+      moveX: (Math.random() - 0.5) * 5,
+      moveY: (Math.random() - 0.5) * 5,
+      animationDelay: Math.random() * 1,
+      animationDuration: Math.random() * 10 + 5,
+      blur: Math.random() * 5
     });
 
-    setParticles(Array.from({ length: 100 }, generateParticle));
+    setParticles(Array.from({ length: 150 }, generateParticle));
   }, []);
 
   return (
@@ -37,7 +49,7 @@ const SparkleParticles = () => {
             '--blur': `${particle.blur}px`,
             animation: `${styles.float} ${particle.animationDuration}s ease-in-out infinite alternate`,
             animationDelay: `${particle.animationDelay}s`
-          }}
+          } as React.CSSProperties}
         />
       ))}
     </div>
