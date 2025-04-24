@@ -1,11 +1,10 @@
-// components/TransactionTracker.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from '../pages/Merchant.module.css';
 import { listenToEvents } from '../modules/eventListener.js';
 import { searchTransaction } from '../modules/transactionSearcher.js';
-import { EventData, SearchResult, Wallets } from '../types'; // اصلاح مسیر به ../types
+import { EventData, SearchResult, Wallets } from '../types';
 
 interface TransactionTrackerProps {
   wallets: Wallets;
@@ -17,17 +16,39 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
   const [events, setEvents] = useState<EventData[]>([]);
   const [searchInvoiceId, setSearchInvoiceId] = useState<string>('');
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
+  const eventListenerRef = useRef<(() => void) | null>(null);
 
   // Subscribe to blockchain event stream
   useEffect(() => {
+    // پاکسازی شنونده قبلی
+    if (eventListenerRef.current) {
+      eventListenerRef.current();
+      eventListenerRef.current = null;
+    }
+
     const onEvent = (event: EventData) => {
       setEvents((prev) => {
         const e = [...prev, { ...event, timestamp: Date.now() }];
-        return e.slice(-10);
+        return e.slice(-10); // محدود به 10 رویداد آخر
       });
     };
-    listenToEvents(wallets, onEvent);
-  }, [wallets]);
+
+    // راه‌اندازی شنونده
+    try {
+      const cleanup = listenToEvents(wallets, onEvent, setError);
+      eventListenerRef.current = cleanup;
+    } catch (err) {
+      setError('Failed to initialize event listener: ' + (err as Error).message);
+    }
+
+    // پاکسازی در هنگام Unmount یا تغییر وابستگی‌ها
+    return () => {
+      if (eventListenerRef.current) {
+        eventListenerRef.current();
+        eventListenerRef.current = null;
+      }
+    };
+  }, [wallets, setError]);
 
   // Search transaction by invoice ID
   const handleSearch = async (e: React.FormEvent) => {

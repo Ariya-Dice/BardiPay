@@ -6,7 +6,7 @@ import styles from '../pages/Merchant.module.css';
 import { generateQRCode } from '../modules/qrGenerator.js';
 import { convertToCrypto } from '../modules/priceFetcher.js';
 import { Wallets, currencies } from './types';
-import { validateAddress } from '../components/validateAddress'; // ایمپورت تابع جدید
+import { validateAddress } from '../components/validateAddress';
 
 interface InvoiceCreatorProps {
   wallets: Wallets;
@@ -62,6 +62,28 @@ export default function InvoiceCreator({ wallets, setError, setResult, result }:
     return true;
   };
 
+  const formatToFiveDecimals = (value: string | number): string => {
+    // تبدیل به عدد و محدود کردن به 5 رقم اعشار
+    const numberValue = parseFloat(value.toString());
+    if (isNaN(numberValue)) return '0';
+    const formatted = numberValue.toFixed(5).replace(/\.?0+$/, '');
+    return formatted;
+  };
+
+  const validateCryptoAmount = (amountCrypto: string, token: string): boolean => {
+    const decimals = amountCrypto.split('.')[1]?.length || 0;
+    if (decimals > 5) {
+      setError(`Amount in ${token} exceeds 5 decimal places`);
+      return false;
+    }
+    const amount = parseFloat(amountCrypto);
+    if (amount <= 0 || isNaN(amount)) {
+      setError(`Invalid cryptocurrency amount for ${token}`);
+      return false;
+    }
+    return true;
+  };
+
   const handleAmountChange = (value: string) => {
     setFormData({ ...formData, amountUSD: value });
     validateAmount(value);
@@ -76,21 +98,39 @@ export default function InvoiceCreator({ wallets, setError, setResult, result }:
         return;
       }
       const recipient = wallets[network as keyof Wallets];
-      // اعتبارسنجی آدرس کیف پول
       const { isValid, error } = validateAddress(network as keyof Wallets, recipient);
       if (!isValid) {
         setError(error || `Invalid wallet address for ${network}`);
         return;
       }
-      const amountCrypto = await convertToCrypto(amountUSD, token);
-      if (!amountCrypto || isNaN(amountCrypto) || amountCrypto <= 0) {
+      const amountCryptoRaw = await convertToCrypto(amountUSD, token);
+      if (!amountCryptoRaw || isNaN(parseFloat(amountCryptoRaw))) {
         setError('Error calculating cryptocurrency amount');
         return;
       }
+      // محدود کردن amountCrypto به 5 رقم اعشار
+      const amountCrypto = formatToFiveDecimals(amountCryptoRaw);
+      if (!validateCryptoAmount(amountCrypto, token)) {
+        return;
+      }
       const invoiceId = Math.random().toString(36).slice(2, 10);
-      const qrCode = await generateQRCode({ amount: amountCrypto.toString(), recipient, invoiceId, network, token });
+      const qrCode = await generateQRCode({
+        amount: amountCrypto,
+        recipient,
+        invoiceId,
+        network,
+        token,
+      });
 
-      setResult({ amountUSD, amountCrypto: amountCrypto.toString(), token, network, invoiceId, qrCode, recipient });
+      setResult({
+        amountUSD,
+        amountCrypto,
+        token,
+        network,
+        invoiceId,
+        qrCode,
+        recipient,
+      });
       setError(null);
     } catch (err) {
       setError('Error generating QR code: ' + (err as Error).message);
@@ -140,7 +180,9 @@ export default function InvoiceCreator({ wallets, setError, setResult, result }:
       {result && (
         <section className={styles.resultSection}>
           <h3 className={styles.resultTitle}>Payment Request</h3>
-          <p className={styles.resultText}>Amount: {result.amountUSD} USD = {result.amountCrypto} {result.token}</p>
+          <p className={styles.resultText}>
+            Amount: {result.amountUSD} USD = {formatToFiveDecimals(result.amountCrypto)} {result.token}
+          </p>
           <p className={styles.resultText}>Network: {result.network}</p>
           <p className={styles.resultText}>Recipient: {result.recipient}</p>
           <p className={styles.resultText}>Invoice ID: {result.invoiceId}</p>

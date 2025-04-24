@@ -1,4 +1,3 @@
-// components/WalletManager.tsx
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -17,19 +16,35 @@ export default function WalletManager({ wallets, onWalletChange }: WalletManager
   const [errors, setErrors] = useState<Partial<Record<keyof Wallets, string>>>({});
   const [touched, setTouched] = useState<Partial<Record<keyof Wallets, boolean>>>({});
 
-  // اصلاح وابستگی‌های useEffect
+  // بارگذاری کیف پول‌ها از localStorage فقط یک بار در مونت
   useEffect(() => {
-    const saved = localStorage.getItem('merchantWallets');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setLocalWallets(parsed);
-      Object.entries(parsed).forEach(([network, address]) => {
-        onWalletChange(network as keyof Wallets, address as string);
-      });
+    try {
+      const saved = localStorage.getItem('merchantWallets');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // فقط کیف پول‌های معتبر را بارگذاری کنید
+        const validWallets: Wallets = { ...wallets, ...parsed };
+        setLocalWallets(validWallets);
+        Object.entries(validWallets).forEach(([network, address]) => {
+          if (address) {
+            onWalletChange(network as keyof Wallets, address as string);
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load wallets from localStorage:', error);
     }
-  }, [onWalletChange]); // افزودن وابستگی
+  }, []); // وابستگی خالی برای اجرای فقط یک بار
 
-  // استفاده از useCallback برای بهینه‌سازی
+  // ذخیره کیف پول‌ها در localStorage هنگام تغییر
+  useEffect(() => {
+    try {
+      localStorage.setItem('merchantWallets', JSON.stringify(localWallets));
+    } catch (error) {
+      console.error('Failed to save wallets to localStorage:', error);
+    }
+  }, [localWallets]);
+
   const handleChange = useCallback(
     (network: keyof Wallets, address: string) => {
       setLocalWallets((prev) => ({ ...prev, [network]: address }));
@@ -37,11 +52,18 @@ export default function WalletManager({ wallets, onWalletChange }: WalletManager
 
       if (address.trim()) {
         const { isValid, error } = validateAddress(network, address);
-        setErrors((prev) => ({ ...prev, [network]: isValid ? undefined : error }));
+        setErrors((prev) => ({
+          ...prev,
+          [network]: isValid ? undefined : error || `Invalid ${network} address`,
+        }));
+        // فقط اگر آدرس معتبر است، به والد اطلاع دهید
+        if (isValid) {
+          onWalletChange(network, address);
+        }
       } else {
         setErrors((prev) => ({ ...prev, [network]: undefined }));
+        onWalletChange(network, address);
       }
-      onWalletChange(network, address);
     },
     [onWalletChange]
   );
@@ -50,7 +72,10 @@ export default function WalletManager({ wallets, onWalletChange }: WalletManager
     (network: keyof Wallets, address: string) => {
       if (touched[network] && address.trim()) {
         const { isValid, error } = validateAddress(network, address);
-        setErrors((prev) => ({ ...prev, [network]: isValid ? undefined : error }));
+        setErrors((prev) => ({
+          ...prev,
+          [network]: isValid ? undefined : error || `Invalid ${network} address`,
+        }));
       }
     },
     [touched]
@@ -67,6 +92,9 @@ export default function WalletManager({ wallets, onWalletChange }: WalletManager
               alt={`${network} icon`}
               width={24}
               height={24}
+              onError={(e) => {
+                e.currentTarget.src = '/fallback.png'; // تصویر جایگزین در صورت خطا
+              }}
             />
             <span className={styles.walletNetworkName}>
               {network.charAt(0).toUpperCase() + network.slice(1)} Address:
@@ -74,8 +102,8 @@ export default function WalletManager({ wallets, onWalletChange }: WalletManager
           </label>
           <input
             type="text"
-            placeholder={`${network} address...`}
-            value={localWallets[network]}
+            placeholder={`Enter ${network} address...`}
+            value={localWallets[network] || ''} // اطمینان از مقدار پیش‌فرض
             onChange={(e) => handleChange(network, e.target.value)}
             onBlur={(e) => handleBlur(network, e.target.value)}
             className={`${styles.walletInput} ${touched[network] && errors[network] ? styles.inputError : ''}`}

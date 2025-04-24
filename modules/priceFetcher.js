@@ -39,5 +39,8 @@ export async function fetchPrice(currency) {
 export async function convertToCrypto(amountUSD, currency) {
   if (!amountUSD || isNaN(amountUSD)) throw new Error('Invalid USD amount');
   const price = await fetchPrice(currency);
-  return amountUSD / price;
+  const amountCryptoRaw = parseFloat(amountUSD) / price;
+  // محدود کردن به 5 رقم اعشار و حذف صفرهای اضافی
+  const amountCrypto = parseFloat(amountCryptoRaw.toFixed(5)).toString();
+  return amountCrypto;
 }

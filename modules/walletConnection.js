@@ -3,6 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { ethers } from 'ethers';
+import { EthereumProvider } from '@walletconnect/ethereum-provider';
 import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { getOrCreateAssociatedTokenAccount, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { createTransaction } from './transactionCreator';
@@ -17,9 +18,22 @@ const WalletConnection = ({ paymentInfo }) => {
   const [txStatus, setTxStatus] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const projectDetails = {
+    projectId: '675ca087a0677efd93064248799db0d1',
+    name: 'simple crypto payment sysytem',
+    description: 'simple crypto payment sysytem',
+    link: 'https://aapay.vercel.app/',
+  };
+
   const handleError = (error) => {
     let errorMessage = 'Error processing transaction';
-    if (error.message.includes('Insufficient funds')) {
+    if (error.code === 4001) {
+      errorMessage = 'You rejected the connection request.';
+    } else if (error.code === -32002) {
+      errorMessage = 'A connection request is already pending.';
+    } else if (error.message.includes('No provider found')) {
+      errorMessage = 'No wallet detected. Please install a compatible wallet like MetaMask or Trust Wallet.';
+    } else if (error.message.includes('Insufficient funds')) {
       errorMessage = 'Insufficient funds in your account. Please top up your account.';
     } else if (error.message.includes('Insufficient token balance')) {
       errorMessage = 'Insufficient token balance. Please top up your token balance.';
@@ -29,10 +43,6 @@ const WalletConnection = ({ paymentInfo }) => {
       errorMessage = 'Failed to estimate gas. Please try again or check your wallet.';
     } else if (error.code === 'NETWORK_ERROR') {
       errorMessage = `Incorrect network. Please switch to ${paymentInfo?.network === 'bsc' ? 'BSC' : 'Ethereum'}.`;
-    } else if (error.code === 4001) {
-      errorMessage = 'You rejected the connection request.';
-    } else if (error.code === -32002) {
-      errorMessage = 'A connection request is already pending.';
     } else if (error.message.includes('MetaMask not found')) {
       errorMessage = 'Wallet not found. Please install MetaMask.';
     } else if (error.message.includes('Invalid recipient address')) {
@@ -179,22 +189,43 @@ const WalletConnection = ({ paymentInfo }) => {
         return;
       } else if (network === 'ethereum' || network === 'bsc') {
         const provider = await detectEthereumProvider();
-        if (!provider || !provider.isMetaMask) {
-          throw new Error('MetaMask not found. Please install MetaMask.');
+        if (provider && provider.isMetaMask) {
+          console.log('MetaMask detected');
+          const ethersProvider = new ethers.providers.Web3Provider(provider);
+          const currentNetwork = await ethersProvider.getNetwork();
+          if (currentNetwork.chainId !== chainId) {
+            await switchNetwork(provider, chainId);
+          }
+          const accounts = await provider.request({ method: 'eth_requestAccounts' });
+          const signer = ethersProvider.getSigner();
+          setAccount(accounts[0]);
+          const result = await createTransaction(signer, paymentInfo);
+          setTxStatus(`Transaction successful: ${result.transactionHash}`);
+        } else {
+          console.log('Using WalletConnect');
+          const wcProvider = await EthereumProvider.init({
+            projectId: projectDetails.projectId,
+            chains: [chainId],
+            showQrModal: true,
+            methods: ['eth_sendTransaction', 'personal_sign'],
+            events: ['chainChanged', 'accountsChanged'],
+            metadata: {
+              name: projectDetails.name,
+              description: projectDetails.description,
+              url: projectDetails.link,
+              icons: ['https://www.lottoariya.xyz/favicon.ico'],
+            },
+          });
+
+          await wcProvider.connect();
+          console.log('WalletConnect connected');
+          const ethersProvider = new ethers.providers.Web3Provider(wcProvider);
+          const signer = ethersProvider.getSigner();
+          const address = await signer.getAddress();
+          setAccount(address);
+          const result = await createTransaction(signer, paymentInfo);
+          setTxStatus(`Transaction successful: ${result.transactionHash}`);
         }
-
-        const ethersProvider = new ethers.providers.Web3Provider(provider);
-        const currentNetwork = await ethersProvider.getNetwork();
-        if (currentNetwork.chainId !== chainId) {
-          await switchNetwork(provider, chainId);
-        }
-
-        const accounts = await provider.request({ method: 'eth_requestAccounts' });
-        const signer = ethersProvider.getSigner();
-        setAccount(accounts[0]);
-
-        const result = await createTransaction(signer, paymentInfo);
-        setTxStatus(`Transaction successful: ${result.transactionHash}`);
       } else if (network === 'tron') {
         const { tronWeb, account } = await connectTronWallet();
         setAccount(account);

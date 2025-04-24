@@ -1,13 +1,12 @@
-// pages/merchant.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import styles from './Merchant.module.css';
 import SparkleParticles from '../components/SparkleParticles';
 import WalletManager from '../components/WalletManager';
 import InvoiceCreator from '../components/InvoiceCreator';
 import TransactionTracker from '../components/TransactionTracker';
-import { Wallets } from '../components/types'; // اصلاح مسیر به ../components/types
+import { Wallets } from '../components/types';
 
 export default function Merchant() {
   const [wallets, setWallets] = useState<Wallets>({
@@ -28,12 +27,16 @@ export default function Merchant() {
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Persist wallet changes
-  const handleWalletChange = (network: keyof Wallets, address: string) => {
+  // بهینه‌سازی handleWalletChange با useCallback
+  const handleWalletChange = useCallback((network: keyof Wallets, address: string) => {
     const updated = { ...wallets, [network]: address };
     setWallets(updated);
-    localStorage.setItem('merchantWallets', JSON.stringify(updated));
-  };
+    try {
+      localStorage.setItem('merchantWallets', JSON.stringify(updated));
+    } catch (err) {
+      console.error('Failed to save wallets to localStorage:', err);
+    }
+  }, [wallets]);
 
   return (
     <div className={styles.container}>
@@ -42,7 +45,11 @@ export default function Merchant() {
         <h1 className={styles.title}>Merchant Dashboard</h1>
         <WalletManager wallets={wallets} onWalletChange={handleWalletChange} />
         <InvoiceCreator wallets={wallets} setError={setError} setResult={setResult} result={result} />
-        <TransactionTracker wallets={wallets} network={result?.network || 'ethereum'} setError={setError} />
+        <TransactionTracker
+          wallets={wallets}
+          network={result?.network || 'ethereum'}
+          setError={setError}
+        />
         {error && <p className={styles.errorMessage}>{error}</p>}
       </div>
     </div>

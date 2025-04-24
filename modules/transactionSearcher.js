@@ -1,4 +1,3 @@
-// modules/transactionSearcher.js
 import { ethers } from 'ethers';
 
 const tokenAddresses = {
@@ -12,7 +11,7 @@ const providerUrls = {
 };
 
 export const searchTransaction = async (invoiceId, merchantAddress, network) => {
-  const provider = new ethers.JsonRpcProvider(providerUrls[network]);
+  const provider = new ethers.providers.JsonRpcProvider(providerUrls[network]);
   const tokenAddress = tokenAddresses[network];
 
   // سرچ برای USDT
@@ -27,11 +26,16 @@ export const searchTransaction = async (invoiceId, merchantAddress, network) => 
     const events = await contract.queryFilter(filter, -1000); // 1000 بلاک آخر
     for (const event of events) {
       const tx = await provider.getTransaction(event.transactionHash);
-      const txInvoiceId = tx.data !== '0x' ? ethers.toUtf8String(tx.data) : null;
+      let txInvoiceId = null;
+      try {
+        txInvoiceId = tx.data !== '0x' ? ethers.utils.toUtf8String(tx.data) : null;
+      } catch (error) {
+        console.warn('Failed to decode tx data:', error);
+      }
       if (txInvoiceId === invoiceId) {
         return {
           token: 'USDT',
-          amount: ethers.formatUnits(event.args.value, 6),
+          amount: ethers.utils.formatUnits(event.args.value, 6),
           from: event.args.from,
           to: event.args.to,
           invoiceId,
@@ -53,11 +57,16 @@ export const searchTransaction = async (invoiceId, merchantAddress, network) => 
         tx.to.toLowerCase() === merchantAddress.toLowerCase() &&
         tx.data !== '0x'
       ) {
-        const txInvoiceId = ethers.toUtf8String(tx.data);
+        let txInvoiceId = null;
+        try {
+          txInvoiceId = ethers.utils.toUtf8String(tx.data);
+        } catch (error) {
+          console.warn('Failed to decode tx data:', error);
+        }
         if (txInvoiceId === invoiceId) {
           return {
             token: network === 'ethereum' ? 'ETH' : 'BNB',
-            amount: ethers.formatEther(tx.value),
+            amount: ethers.utils.formatEther(tx.value),
             from: tx.from,
             to: tx.to,
             invoiceId,
