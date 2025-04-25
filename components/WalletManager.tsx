@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import styles from '../pages/Merchant.module.css';
+import styles from '../styles/Merchant.module.css';
 import { Wallets } from './types';
 import { validateAddress } from '../components/validateAddress';
 

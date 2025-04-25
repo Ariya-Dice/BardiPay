@@ -5,7 +5,7 @@ import { useState, Component, ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { QRScanner } from '../components/QRScanner';
 import SparkleParticles from '../components/SparkleParticles';
-import styles from './Buyer.module.css';
+import styles from '../styles/Buyer.module.css';
 
 export interface PaymentInfo {
   amount: string;

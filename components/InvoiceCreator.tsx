@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import styles from '../pages/Merchant.module.css';
-import { generateQRCode } from '../modules/qrGenerator.js';
-import { convertToCrypto } from '../modules/priceFetcher.js';
+import styles from '../styles/Merchant.module.css';
+import { generateQRCode } from '../modules/qrGenerator';
+import { convertToCrypto } from '../modules/priceFetcher';
 import { Wallets, currencies } from './types';
 import { validateAddress } from '../components/validateAddress';
 

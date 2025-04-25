@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import styles from './Merchant.module.css';
+import styles from '../styles/Merchant.module.css';
 import SparkleParticles from '../components/SparkleParticles';
 import WalletManager from '../components/WalletManager';
 import InvoiceCreator from '../components/InvoiceCreator';

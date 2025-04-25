@@ -1,8 +1,7 @@
 'use client';
-
 import { useState, useEffect, useRef } from 'react';
-import styles from '../pages/Merchant.module.css';
-import { listenToEvents } from '../modules/eventListener.js';
+import styles from '../styles/Merchant.module.css';
+import { listenToEvents } from '../modules/eventListener';
 import { searchTransaction } from '../modules/transactionSearcher.js';
 import { EventData, SearchResult, Wallets } from '../types';
 
@@ -18,9 +17,7 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
   const eventListenerRef = useRef<(() => void) | null>(null);
 
-  // Subscribe to blockchain event stream
   useEffect(() => {
-    // پاکسازی شنونده قبلی
     if (eventListenerRef.current) {
       eventListenerRef.current();
       eventListenerRef.current = null;
@@ -29,19 +26,17 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
     const onEvent = (event: EventData) => {
       setEvents((prev) => {
         const e = [...prev, { ...event, timestamp: Date.now() }];
-        return e.slice(-10); // محدود به 10 رویداد آخر
+        return e.slice(-10);
       });
     };
 
-    // راه‌اندازی شنونده
     try {
-      const cleanup = listenToEvents(wallets, onEvent, setError);
+      const cleanup = listenToEvents(wallets, onEvent);
       eventListenerRef.current = cleanup;
     } catch (err) {
       setError('Failed to initialize event listener: ' + (err as Error).message);
     }
 
-    // پاکسازی در هنگام Unmount یا تغییر وابستگی‌ها
     return () => {
       if (eventListenerRef.current) {
         eventListenerRef.current();
@@ -50,7 +45,6 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
     };
   }, [wallets, setError]);
 
-  // Search transaction by invoice ID
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     try {

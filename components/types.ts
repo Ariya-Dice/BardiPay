@@ -1,4 +1,3 @@
-// components/types.ts
 export interface Wallets {
   ethereum: string;
   bsc: string;
@@ -50,4 +49,6 @@ export const currencies = [
   { token: 'RAY', network: 'solana', name: 'Raydium (RAY)' },
   { token: 'SRM', network: 'solana', name: 'Serum (SRM)' },
   { token: 'ORCA', network: 'solana', name: 'Orca (ORCA)' },
-];
+] as const;
+
+export type SupportedCurrency = typeof currencies[number];
