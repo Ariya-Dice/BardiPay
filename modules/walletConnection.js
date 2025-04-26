@@ -6,7 +6,8 @@ import { ethers } from 'ethers';
 import { EthereumProvider } from '@walletconnect/ethereum-provider';
 import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { getOrCreateAssociatedTokenAccount, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { createTransaction } from './transactionCreator';
+import { createTransferCheckedInstruction } from '@solana/spl-token';
+import { createTransaction } from '../modules/transactionCreator';
 import dynamic from 'next/dynamic';
 import styles from '../pages/Buyer.module.css';
 
@@ -137,39 +138,49 @@ const WalletConnection = ({ paymentInfo }) => {
   };
 
   const sendSolanaTransaction = async (solana, recipient, amount, token, contractAddress) => {
-    try {
-      const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
-      const fromPubkey = new PublicKey(solana.publicKey);
-      const toPubkey = new PublicKey(recipient);
+  try {
+    const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+    const fromPubkey = new PublicKey(solana.publicKey);
+    const toPubkey = new PublicKey(recipient);
+    const decimals = 9; // مقدار واقعی را از API بگیرید
 
-      if (token === 'SOL') {
-        const transaction = new Transaction().add(
-          SystemProgram.transfer({
-            fromPubkey,
-            toPubkey,
-            lamports: amount * LAMPORTS_PER_SOL,
-          })
-        );
-        const signature = await solana.signAndSendTransaction(transaction);
-        await connection.confirmTransaction(signature);
-        return signature;
-      } else if (contractAddress) {
-        const mintPubkey = new PublicKey(contractAddress);
-        const fromTokenAccount = await getOrCreateAssociatedTokenAccount(connection, fromPubkey, mintPubkey, fromPubkey);
-        const toTokenAccount = await getOrCreateAssociatedTokenAccount(connection, fromPubkey, mintPubkey, toPubkey);
-        const transaction = new Transaction().add(
-          createTransferInstruction(fromTokenAccount.address, toTokenAccount.address, fromPubkey, amount * 1e9, [], TOKEN_PROGRAM_ID)
-        );
-        const signature = await solana.signAndSendTransaction(transaction);
-        await connection.confirmTransaction(signature);
-        return signature;
-      } else {
-        throw new Error('Contract address for SPL token not provided.');
-      }
-    } catch (error) {
-      throw new Error(`Error sending Solana transaction: ${error.message}`);
+    if (token === 'SOL') {
+      const transaction = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey,
+          toPubkey,
+          lamports: amount * LAMPORTS_PER_SOL,
+        })
+      );
+      const signature = await solana.signAndSendTransaction(transaction);
+      await connection.confirmTransaction(signature);
+      return signature;
+    } else if (contractAddress) {
+      const mintPubkey = new PublicKey(contractAddress);
+      const fromTokenAccount = await getOrCreateAssociatedTokenAccount(connection, fromPubkey, mintPubkey, fromPubkey);
+      const toTokenAccount = await getOrCreateAssociatedTokenAccount(connection, fromPubkey, mintPubkey, toPubkey);
+      
+      const transaction = new Transaction().add(
+        createTransferCheckedInstruction(
+          fromTokenAccount.address,
+          mintPubkey,
+          toTokenAccount.address,
+          fromPubkey,
+          amount * Math.pow(10, decimals),
+          decimals
+        )
+      );
+      
+      const signature = await solana.signAndSendTransaction(transaction);
+      await connection.confirmTransaction(signature);
+      return signature;
+    } else {
+      throw new Error('Contract address for SPL token not provided.');
     }
-  };
+  } catch (error) {
+    throw new Error(`Error sending Solana transaction: ${error.message}`);
+  }
+};
 
   const connectWallet = useCallback(async () => {
     if (!paymentInfo) {
