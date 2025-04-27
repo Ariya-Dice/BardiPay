@@ -29,23 +29,23 @@ export default function Merchant() {
 
   // بهینه‌سازی handleWalletChange با useCallback
   const handleWalletChange = useCallback((network: keyof Wallets, address: string) => {
-  const updated = { ...wallets };
+    const updated = { ...wallets };
 
-  if (network === 'ethereum' || network === 'bsc') {
-    updated['ethereum'] = address;
-    updated['bsc'] = address;
-  } else {
-    updated[network] = address;
-  }
+    if (network === 'ethereum' || network === 'bsc') {
+      updated['ethereum'] = address;
+      updated['bsc'] = address;
+    } else {
+      updated[network] = address;
+    }
 
-  setWallets(updated);
+    setWallets(updated);
 
-  try {
-    localStorage.setItem('merchantWallets', JSON.stringify(updated));
-  } catch (err) {
-    console.error('Failed to save wallets to localStorage:', err);
-  }
-}, [wallets]);
+    try {
+      localStorage.setItem('merchantWallets', JSON.stringify(updated));
+    } catch (err) {
+      console.error('Failed to save wallets to localStorage:', err);
+    }
+  }, [wallets]);
 
   return (
     <div className={styles.container}>

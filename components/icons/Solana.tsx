@@ -9,13 +9,11 @@ interface IconProps {
 export default function SolanaIcon({ active = false }: IconProps) {
   return (
     <svg
-      version="1.1"
-      id="Layer_1"
-      xmlns="http://www.w3.org/2000/svg"
-      xmlnsXlink="http://www.w3.org/1999/xlink"
-      viewBox="0 0 500 500"
-      style={{ enableBackground: 'new 0 0 397.7 311.7' }}
-      xmlSpace="preserve"
+        xmlns="http://www.w3.org/2000/svg"
+  xmlnsXlink="http://www.w3.org/1999/xlink"
+  viewBox="0 0 500 500"
+  enableBackground="new 0 0 397.7 311.7"
+  xmlSpace="preserve"
     >
       <defs>
         <linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="360.8791" y1="351.4553" x2="141.213" y2="-69.2936" gradientTransform="matrix(1 0 0 -1 0 314)">

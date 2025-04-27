@@ -1,3 +1,5 @@
+// components/types.ts
+
 export interface Wallets {
   ethereum: string;
   bsc: string;
@@ -5,7 +7,6 @@ export interface Wallets {
   solana: string;
   bitcoin: string;
 }
-
 export interface EventData {
   token: string;
   amount: string;

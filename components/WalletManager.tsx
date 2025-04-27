@@ -40,9 +40,6 @@ export default function WalletManager({ wallets, onWalletChange }: WalletManager
       if (detectedCoin === 'ethereum') {
         onWalletChange('bsc', value);
       }
-      if (detectedCoin === 'bsc') {
-        onWalletChange('ethereum', value);
-      }
       setInputAddress('');
     }
   };
