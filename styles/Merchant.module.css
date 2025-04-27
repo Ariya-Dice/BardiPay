@@ -1,5 +1,4 @@
-/* Merchant.module.css */
-
+/* Container */
 .container {
   padding: 20px;
   text-align: center;
@@ -19,67 +18,102 @@
   padding: 20px;
 }
 
-/* استایل بخش مدیریت والت‌ها */
+/* Wallet Section */
 .walletSection {
   margin: 20px auto;
   background: transparent;
-  padding: 10px;
+  padding: 20px;
   border-radius: 16px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-  perspective: 1000px;
-  max-width: 900px; /* افزایش عرض برای نمایش بهتر استوانه */
+  max-width: 900px;
 }
 
-.walletSectionTitle {
-  font-size: 2rem;
-  margin-bottom: 10px;
-  color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+/* Scroll Container */
+.scrollContainer {
+  width: 100%;
+  max-height: 300px; /* Increased height for better card visibility */
+  overflow-y: auto; /* Enable vertical scroll */
+  overflow-x: hidden; /* Disable horizontal scroll */
+  perspective: 800px; /* Adjusted for better 3D effect */
+  padding: 20px 0;
+  scrollbar-width: thin;
 }
 
-/* استایل کارت‌های چرخان */
-.walletCard {
+/* Cylinder */
+.cylinder {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d; /* Enable 3D transforms for children */
+  transition: transform 0.2s ease-out; /* Smooth rotation */
+}
+
+/* Card */
+.card {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 320px;
-  padding: 20px;
-  background: transparent;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 500px;
+  height: 120px;
+  background: transparent; /* Transparent background */
+  border-radius: 20px;
+  padding: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  transform-style: preserve-3d;
+  backface-visibility: hidden; /* Hide back of card */
+  margin: 0 auto;
+  pointer-events: none; /* Disable interaction for non-visible cards */
+}
+
+/* Enable interaction for the top card */
+.card:first-child {
+  pointer-events: auto;
+}
+
+/* Wallet Input Styles */
+.walletInputContainer {
+  width: 100%;
   display: flex;
+  flex-direction: row; /* Horizontal layout for icon, name, and input */
   align-items: center;
-  gap: 15px;
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  justify-content: space-between;
+  gap: 10px;
+  position: relative;
 }
 
 .walletLabel {
   display: flex;
+  flex-direction: row; /* Horizontal layout for icon and name */
   align-items: center;
-  gap: 12px;
-  width: 100%;
-  margin-bottom: 10px;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
-.searchError {
-  color: #ff4d4f;
-  font-size: 0.6rem;
-  margin-top: 10px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.tokenIcon {
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+  transition: transform 0.3s ease;
 }
 
+.tokenIcon:hover {
+  transform: scale(1.1);
+}
+
+.walletNetworkName {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+}
 
 .walletInput {
-  padding: 10px 15px;
-  border: 1px solid #555555;
-  border-radius: 8px;
+  flex-grow: 1;
+  padding: 8px 12px;
   background: rgba(30, 30, 40, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  font-size: 0.9rem;
   color: #ffffff;
-  width: 100%;
-  transition: border-color 0.2s ease;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
 }
 
 .walletInput:focus {
@@ -88,52 +122,46 @@
   box-shadow: 0 0 8px rgba(0, 112, 243, 0.3);
 }
 
-
-/* استایل‌های مربوط به چرخش 3D */
-.cylinderContainer {
-  height: 300px;
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform 0.3s ease-out;
-}
 .inputError {
-  border: 1px solid #ff4d4f; /* رنگ قرمز برای حاشیه */
-  background-color: #fff1f0; /* پس‌زمینه کمی صورتی برای نمایش خطا */
+  border: 1px solid #ff4d4f; /* Red border for error */
+  background-color: #fff1f0; /* Light pink background for error */
   animation: shake 0.4s ease-in-out;
 }
 
-/* انیمیشن برای خطا */
+/* Error Message */
+.errorMessage {
+  position: static;
+  margin-top: 5px;
+  font-size: 0.8rem;
+  color: #ff4d4f;
+  text-align: center;
+}
+
+/* Animation for error */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-8px); }
   75% { transform: translateX(8px); }
 }
 
-.errorMessage {
-  color: #ff4444;
-  font-size: 0.6rem;
-  margin-top: 1px;
-  text-align: left;
-}
-
-/* استایل منوی آبشاری */
+/* Currency Select */
 .currencySelect {
   padding: 8px;
   border: 1px solid #555555;
   border-radius: 6px;
   font-size: 1rem;
-  background: #1a1a1a; /* پس‌زمینه سیاه تیره */
-  color: #ffffff; /* متن سفید برای خوانایی */
+  background: #1a1a1a;
+  color: #ffffff;
   width: 100%;
   max-width: 220px;
   box-sizing: border-box;
   transition: border-color 0.2s ease;
-  -webkit-appearance: none; /* حذف استایل پیش‌فرض مرورگر */
+  -webkit-appearance: none;
   -moz-appearance: none;
-  appearance: none; /* برای سازگاری با مرورگرهای مختلف */
+  appearance: none;
 }
-/* Merchant.module.css */
 
+/* Submit Button */
 .submitButton {
   display: inline-block;
   padding: 12px 24px;
@@ -146,21 +174,9 @@
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 112, 243, 0.3);
-    width: max-content;
-  margin: 0 auto;
-  min-width: 400px;
-}
-
-.eventLogSection {
-  margin-top: 20px; /* فاصله کم از بالا */
-  margin-bottom: 20px; /* فاصله کم از پایین */
-  padding: 20px;
-  background: transparent;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
+  width: max-content;
+  margin: 20px auto;
+  min-width: 300px; /* Adjusted for mobile */
 }
 
 .submitButton:hover {
@@ -180,8 +196,7 @@
   box-shadow: none;
 }
 
-
-/* استایل دکمه‌ها */
+/* Search Button */
 .searchButton {
   padding: 10px 20px;
   cursor: pointer;
@@ -191,41 +206,93 @@
   border-radius: 6px;
   font-size: 1rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  margin-top: 10px; /* فاصله از فیلدها */
+  margin-top: 10px;
 }
 
-/* حفظ افکت hover برای دکمه‌ها */
 .searchButton:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 15px rgba(106, 17, 203, 0.4);
 }
 
+/* Event Log Section */
+.eventLogSection {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: transparent;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Result Section */
 .resultSection {
   max-width: 400px;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* جدید: برای وسط چین عمودی */
+  justify-content: center;
   text-align: center;
-  margin: 0 auto; /* جدید: برای وسط چین افقی */
-  min-height: 30vh; /* یا اگر خواستی کل صفحه، بنویس 100vh */
+  margin: 0 auto;
+  min-height: 30vh;
   background: transparent;
 }
-/* استایل‌های پاسخگویی */
+
+/* Scrollbar Styles */
+.scrollContainer::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  backdrop-filter: blur(10px);
+}
+
+.scrollContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Responsive Styles */
 @media (max-width: 768px) {
   .walletSection {
     max-width: 95%;
-    padding: 20px;
-  }
-
-  .walletCard {
-    width: 280px;
     padding: 15px;
   }
 
-  .cylinderContainer {
-    height: 300px;
+  .scrollContainer {
+    max-height: 320px; /* Slightly taller for mobile */
+    perspective: 600px; /* Adjusted for smaller screens */
+  }
+
+  .card {
+    max-width: 400px; /* Smaller card width for mobile */
+  }
+
+  .walletInputContainer {
+    gap: 8px; /* Reduced gap for compact layout */
+  }
+
+  .walletNetworkName {
+    font-size: 1rem; /* Smaller font size for mobile */
+  }
+
+  .walletInput {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+
+  .submitButton {
+    min-width: 250px; /* Adjusted for mobile */
+    padding: 10px 20px;
+  }
+
+  .resultSection {
+    max-width: 90%;
   }
 }
 
@@ -234,12 +301,43 @@
     font-size: 1.7rem;
   }
 
+  .scrollContainer {
+    max-height: 300px; /* Adjusted for very small screens */
+    perspective: 500px;
+  }
+
+  .card {
+    max-width: 300px; /* Even smaller for very small screens */
+    height: 100px; /* Reduced height for compact layout */
+  }
+
+  .walletInputContainer {
+    flex-wrap: wrap; /* Allow wrapping if needed */
+    justify-content: center;
+  }
+
   .walletLabel {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row; /* Keep horizontal layout */
+    gap: 8px;
   }
 
   .walletInput {
-    padding: 8px 12px;
+    width: 100%; /* Full width on very small screens */
+    margin-top: 8px;
+  }
+
+  .errorMessage {
+    font-size: 0.7rem;
+  }
+
+  .submitButton {
+    min-width: 200px;
+    font-size: 0.9rem;
+    padding: 8px 16px;
+  }
+
+  .searchButton {
+    padding: 8px 16px;
+    font-size: 0.9rem;
   }
 }
