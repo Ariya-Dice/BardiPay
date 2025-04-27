@@ -9,117 +9,18 @@
   color: #ffffff;
   overflow: auto;
 }
-
+.walletLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* اینم اضافه بشه */
+  gap: 10px;
+}
 .content {
   position: relative;
   z-index: 1;
-  max-width: 1200px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 20px;
-}
-
-/* Wallet Section */
-.walletSection {
-  margin: 20px auto;
-  background: transparent;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-  max-width: 900px;
-}
-
-/* Scroll Container */
-.scrollContainer {
-  width: 100%;
-  max-height: 300px; /* Increased height for better card visibility */
-  overflow-y: auto; /* Enable vertical scroll */
-  overflow-x: hidden; /* Disable horizontal scroll */
-  perspective: 800px; /* Adjusted for better 3D effect */
-  padding: 20px 0;
-  scrollbar-width: thin;
-}
-
-/* Cylinder */
-.cylinder {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d; /* Enable 3D transforms for children */
-  transition: transform 0.2s ease-out; /* Smooth rotation */
-}
-
-/* Card */
-.card {
-  position: absolute;
-  width: 100%;
-  max-width: 500px;
-  height: 120px;
-  background: transparent; /* Transparent background */
-  border-radius: 20px;
-  padding: 15px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  transform-style: preserve-3d;
-  backface-visibility: hidden; /* Hide back of card */
-  margin: 0 auto;
-  pointer-events: none; /* Disable interaction for non-visible cards */
-}
-
-/* Enable interaction for the top card */
-.card:first-child {
-  pointer-events: auto;
-}
-
-/* Wallet Input Styles */
-.walletInputContainer {
-  width: 100%;
-  display: flex;
-  flex-direction: row; /* Horizontal layout for icon, name, and input */
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  position: relative;
-}
-
-.walletLabel {
-  display: flex;
-  flex-direction: row; /* Horizontal layout for icon and name */
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.tokenIcon {
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
-  transition: transform 0.3s ease;
-}
-
-.tokenIcon:hover {
-  transform: scale(1.1);
-}
-
-.walletNetworkName {
-  font-size: 1.2rem;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  white-space: nowrap;
-}
-
-.walletInput {
-  flex-grow: 1;
-  padding: 8px 12px;
-  background: rgba(30, 30, 40, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  font-size: 0.9rem;
-  color: #ffffff;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
-}
-
-.walletInput:focus {
-  border-color: #0070f3;
-  outline: none;
-  box-shadow: 0 0 8px rgba(0, 112, 243, 0.3);
 }
 
 .inputError {
@@ -132,7 +33,7 @@
 .errorMessage {
   position: static;
   margin-top: 5px;
-  font-size: 0.8rem;
+  font-size: 0.6rem;
   color: #ff4d4f;
   text-align: center;
 }
@@ -165,7 +66,7 @@
 .submitButton {
   display: inline-block;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  background: #1a1a1a;
   color: #ffffff;
   font-weight: 600;
   font-size: 1rem;
@@ -173,7 +74,7 @@
   border-radius: 8px;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 112, 243, 0.3);
+  box-shadow: 0 12px 50px rgba(0, 112, 243, 0.3);
   width: max-content;
   margin: 20px auto;
   min-width: 300px; /* Adjusted for mobile */
@@ -181,7 +82,7 @@
 
 .submitButton:hover {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 6px 18px rgba(106, 17, 203, 0.6);
+  box-shadow: 0 12px 50px rgba(106, 17, 203, 0.6);
 }
 
 .submitButton:active {
@@ -200,7 +101,7 @@
 .searchButton {
   padding: 10px 20px;
   cursor: pointer;
-  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  background: #1a1a1a;
   color: #f1f1f1;
   border: none;
   border-radius: 6px;
@@ -264,28 +165,6 @@
     padding: 15px;
   }
 
-  .scrollContainer {
-    max-height: 320px; /* Slightly taller for mobile */
-    perspective: 600px; /* Adjusted for smaller screens */
-  }
-
-  .card {
-    max-width: 400px; /* Smaller card width for mobile */
-  }
-
-  .walletInputContainer {
-    gap: 8px; /* Reduced gap for compact layout */
-  }
-
-  .walletNetworkName {
-    font-size: 1rem; /* Smaller font size for mobile */
-  }
-
-  .walletInput {
-    padding: 8px 10px;
-    font-size: 0.85rem;
-  }
-
   .submitButton {
     min-width: 250px; /* Adjusted for mobile */
     padding: 10px 20px;
@@ -299,31 +178,6 @@
 @media (max-width: 480px) {
   .walletSectionTitle {
     font-size: 1.7rem;
-  }
-
-  .scrollContainer {
-    max-height: 300px; /* Adjusted for very small screens */
-    perspective: 500px;
-  }
-
-  .card {
-    max-width: 300px; /* Even smaller for very small screens */
-    height: 100px; /* Reduced height for compact layout */
-  }
-
-  .walletInputContainer {
-    flex-wrap: wrap; /* Allow wrapping if needed */
-    justify-content: center;
-  }
-
-  .walletLabel {
-    flex-direction: row; /* Keep horizontal layout */
-    gap: 8px;
-  }
-
-  .walletInput {
-    width: 100%; /* Full width on very small screens */
-    margin-top: 8px;
   }
 
   .errorMessage {
