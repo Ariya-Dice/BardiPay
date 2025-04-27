@@ -1,200 +1,119 @@
-/* حفظ شفافیت برای کانتینر اصلی */
+/* Merchant.module.css */
+
 .container {
   padding: 20px;
   text-align: center;
   font-family: 'Arial', sans-serif;
   position: relative;
   min-height: 100vh;
-  background: transparent; /* پس‌زمینه شفاف */
+  background: transparent;
   color: #ffffff;
   overflow: auto;
 }
 
-/* حفظ z-index برای محتوا */
 .content {
   position: relative;
-  z-index: 1; /* بالای پارتیکل‌ها */
+  z-index: 1;
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }
 
-/* شفاف‌سازی کانتینرهای بخش‌ها */
-.walletSection,
-.formSection,
-.resultSection,
-.eventLogSection,
-.searchSection {
+/* استایل بخش مدیریت والت‌ها */
+.walletSection {
   margin: 20px auto;
-  max-width: 400px;
-  background: transparent; /* پس‌زمینه شفاف */
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* حفظ سایه برای عمق */
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: transparent;
+  padding: 10px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  perspective: 1000px;
+  max-width: 900px; /* افزایش عرض برای نمایش بهتر استوانه */
 }
 
-/* حفظ افکت hover */
-.walletSection:hover,
-.formSection:hover,
-.resultSection:hover,
-.eventLogSection:hover,
-.searchSection:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
-}
-
-/* حفظ استایل عنوان‌ها */
-.walletSectionTitle,
-.resultTitle,
-.eventLogTitle,
-.searchTitle {
-  font-size: 1.5rem;
-  margin-bottom: 15px;
+.walletSectionTitle {
+  font-size: 2rem;
+  margin-bottom: 10px;
   color: #ffffff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* اصلاح تراز و فاصله‌گذاری برای walletInputContainer */
-.walletInputContainer {
-  margin: 15px 0; /* افزایش فاصله عمودی */
-  display: flex;
-  flex-direction: column; /* عمودی کردن برای نظم بیشتر */
-  align-items: flex-start; /* تراز به سمت چپ */
-  gap: 10px;
-}
-
-/* اصلاح تراز لیبل‌ها و آیکون‌ها */
-.walletLabel {
-  font-weight: 500;
-  color: #cccccc;
+/* استایل کارت‌های چرخان */
+.walletCard {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 320px;
+  padding: 20px;
+  background: transparent;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
   display: flex;
   align-items: center;
-  gap: 8px; /* فاصله بین آیکون و متن */
-  width: 100%; /* عرض کامل برای نظم */
+  gap: 15px;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* شفاف‌سازی فیلدهای ورودی */
-.walletInput,
-.amountInput,
-.currencySelect,
-.searchInput {
-  padding: 8px;
+.walletLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.searchError {
+  color: #ff4d4f;
+  font-size: 0.6rem;
+  margin-top: 10px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.walletInput {
+  padding: 10px 15px;
   border: 1px solid #555555;
-  border-radius: 6px;
-  font-size: 1rem;
-  background: transparent; /* پس‌زمینه شفاف */
+  border-radius: 8px;
+  background: rgba(30, 30, 40, 0.8);
   color: #ffffff;
-  width: 100%; /* عرض کامل برای یکنواختی */
-  box-sizing: border-box;
+  width: 100%;
   transition: border-color 0.2s ease;
 }
 
-/* حفظ استایل فوکوس */
-.walletInput:focus,
-.amountInput:focus,
-.currencySelect:focus,
-.searchInput:focus {
+.walletInput:focus {
   border-color: #0070f3;
-  background: transparent;
   outline: none;
+  box-shadow: 0 0 8px rgba(0, 112, 243, 0.3);
 }
 
-/* تنظیم عرض برای amountInput */
-.amountInput {
-  width: 100%; /* عرض کامل برای نظم */
-  max-width: 200px; /* محدود کردن عرض */
+
+/* استایل‌های مربوط به چرخش 3D */
+.cylinderContainer {
+  height: 300px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease-out;
+}
+.inputError {
+  border: 1px solid #ff4d4f; /* رنگ قرمز برای حاشیه */
+  background-color: #fff1f0; /* پس‌زمینه کمی صورتی برای نمایش خطا */
+  animation: shake 0.4s ease-in-out;
 }
 
-/* تنظیم عرض برای currencySelect */
-.currencySelect {
-  width: 100%; /* عرض کامل */
-  max-width: 220px; /* محدود کردن عرض */
+/* انیمیشن برای خطا */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
 }
 
-/* استایل دکمه‌ها */
-.submitButton,
-.searchButton {
-  padding: 10px 20px;
-  cursor: pointer;
-  background: linear-gradient(135deg, #0070f3 0%, #005bb5 100%); /* حفظ گرادیان */
-  color: #ffffff;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  margin-top: 10px; /* فاصله از فیلدها */
-}
-
-/* حفظ افکت hover برای دکمه‌ها */
-.submitButton:hover,
-.searchButton:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 15px rgba(0, 112, 243, 0.4);
-}
-
-.submitButton:disabled {
-  background: #555555;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-/* اصلاح بخش نتیجه */
-.resultSection {
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: transparent; /* پس‌زمینه شفاف */
-}
-
-/* شفاف‌سازی آیتم‌های لیست */
-.eventItem {
-  border: 1px solid #555555;
-  margin: 10px 0;
-  padding: 15px;
-  border-radius: 6px;
-  background: transparent; /* پس‌زمینه شفاف */
-}
-
-/* اصلاح فرم جستجو */
-.searchForm {
-  display: flex;
-  flex-direction: column; /* عمودی کردن برای نظم */
-  align-items: flex-start; /* تراز به چپ */
-  gap: 10px;
-}
-
-/* استایل پیام خطا */
-.errorContainer {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  width: 90%;
-  max-width: 500px;
-}
-
-.errorAlert {
-  background: #ffebee;
-  color: #b71c1c;
-  padding: 12px 20px;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.errorCloseButton {
-  background: none;
-  border: none;
-  color: #b71c1c;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0 8px;
+.errorMessage {
+  color: #ff4444;
+  font-size: 0.6rem;
+  margin-top: 1px;
+  text-align: left;
 }
 
 /* استایل منوی آبشاری */
@@ -213,24 +132,114 @@
   -moz-appearance: none;
   appearance: none; /* برای سازگاری با مرورگرهای مختلف */
 }
+/* Merchant.module.css */
 
-/* استایل حالت فوکوس */
-.currencySelect:focus {
-  border-color: #0070f3;
-  background: #1a1a1a; /* حفظ پس‌زمینه سیاه در فوکوس */
-  outline: none;
-}
-
-/* استایل گزینه‌های منوی آبشاری */
-.currencySelect option {
-  background: #1a1a1a; /* پس‌زمینه سیاه برای گزینه‌ها */
-  color: #ffffff; /* متن سفید برای گزینه‌ها */
+.submitButton {
+  display: inline-block;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  color: #ffffff;
+  font-weight: 600;
   font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 112, 243, 0.3);
+    width: max-content;
+  margin: 0 auto;
+  min-width: 400px;
 }
 
-/* برای اطمینان از خوانایی placeholder یا متن انتخاب‌شده */
-.currencySelect::placeholder {
-  color: #cccccc; /* رنگ خاکستری روشن برای placeholder */
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+.eventLogSection {
+  margin-top: 20px; /* فاصله کم از بالا */
+  margin-bottom: 20px; /* فاصله کم از پایین */
+  padding: 20px;
+  background: transparent;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
+.submitButton:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 18px rgba(106, 17, 203, 0.6);
+}
+
+.submitButton:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px rgba(106, 17, 203, 0.3);
+}
+
+.submitButton:disabled {
+  background: #555555;
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+
+/* استایل دکمه‌ها */
+.searchButton {
+  padding: 10px 20px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  color: #f1f1f1;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-top: 10px; /* فاصله از فیلدها */
+}
+
+/* حفظ افکت hover برای دکمه‌ها */
+.searchButton:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(106, 17, 203, 0.4);
+}
+
+.resultSection {
+  max-width: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* جدید: برای وسط چین عمودی */
+  text-align: center;
+  margin: 0 auto; /* جدید: برای وسط چین افقی */
+  min-height: 30vh; /* یا اگر خواستی کل صفحه، بنویس 100vh */
+  background: transparent;
+}
+/* استایل‌های پاسخگویی */
+@media (max-width: 768px) {
+  .walletSection {
+    max-width: 95%;
+    padding: 20px;
+  }
+
+  .walletCard {
+    width: 280px;
+    padding: 15px;
+  }
+
+  .cylinderContainer {
+    height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .walletSectionTitle {
+    font-size: 1.7rem;
+  }
+
+  .walletLabel {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .walletInput {
+    padding: 8px 12px;
+  }
+}

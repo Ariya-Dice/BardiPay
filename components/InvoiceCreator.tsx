@@ -63,7 +63,6 @@ export default function InvoiceCreator({ wallets, setError, setResult, result }:
   };
 
   const formatToFiveDecimals = (value: string | number): string => {
-    // تبدیل به عدد و محدود کردن به 5 رقم اعشار
     const numberValue = parseFloat(value.toString());
     if (isNaN(numberValue)) return '0';
     const formatted = numberValue.toFixed(5).replace(/\.?0+$/, '');
@@ -108,7 +107,6 @@ export default function InvoiceCreator({ wallets, setError, setResult, result }:
         setError('Error calculating cryptocurrency amount');
         return;
       }
-      // محدود کردن amountCrypto به 5 رقم اعشار
       const amountCrypto = formatToFiveDecimals(amountCryptoRaw);
       if (!validateCryptoAmount(amountCrypto, token)) {
         return;

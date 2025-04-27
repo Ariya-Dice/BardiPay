@@ -1,4 +1,3 @@
-'use client';
 import { useState, useEffect, useRef } from 'react';
 import styles from '../styles/Merchant.module.css';
 import { listenToEvents } from '../modules/eventListener';
@@ -15,6 +14,7 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
   const [events, setEvents] = useState<EventData[]>([]);
   const [searchInvoiceId, setSearchInvoiceId] = useState<string>('');
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
+  const [error, setErrorState] = useState<string | null>(null); // اینجا state برای error ایجاد می‌کنیم
   const eventListenerRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
       const cleanup = listenToEvents(wallets, onEvent);
       eventListenerRef.current = cleanup;
     } catch (err) {
-      setError('Failed to initialize event listener: ' + (err as Error).message);
+      setErrorState('Failed to initialize event listener: ' + (err as Error).message); // استفاده از setErrorState
     }
 
     return () => {
@@ -49,14 +49,14 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
     e.preventDefault();
     try {
       if (!searchInvoiceId) {
-        setError('Please enter an invoice ID');
+        setErrorState('Please enter an invoice ID'); // استفاده از setErrorState
         return;
       }
       const tx = await searchTransaction(searchInvoiceId, wallets, network);
       setSearchResult(tx);
-      setError(null);
+      setErrorState(null); // تنظیم خطا به null
     } catch (err) {
-      setError('Error searching for transaction: ' + (err as Error).message);
+      setErrorState('Error searching for transaction: ' + (err as Error).message); // استفاده از setErrorState
       setSearchResult(null);
     }
   };
@@ -112,6 +112,10 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
           />
           <button type="submit" className={styles.searchButton}>Search</button>
         </form>
+
+        {/* نمایش خطا در صورت وجود */}
+        {error && <p className={styles.searchError}>{error}</p>}
+
         {searchResult && (
           <div className={styles.searchResultSection}>
             <h4 className={styles.searchResultTitle}>Transaction Found</h4>
