@@ -1,0 +1,47 @@
+{
+  "name": "bardipay",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@headlessui/react": "^2.2.4",
+    "@metamask/detect-provider": "^2.0.0",
+    "@solana/spl-token": "^0.4.13",
+    "@solana/web3.js": "^1.98.2",
+    "@walletconnect/ethereum-provider": "^2.20.0",
+    "@zxing/browser": "^0.1.5",
+    "@zxing/library": "^0.21.3",
+    "autoprefixer": "^10.4.21",
+    "axios": "^1.8.4",
+    "ethers": "^5.7.2",
+    "html5-qrcode": "^2.3.8",
+    "moralis": "^2.27.2",
+    "next": "15.3.1",
+    "postcss": "^8.5.3",
+    "qrcode": "^1.5.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tronweb": "^6.0.3",
+    "uuid": "^11.1.0",
+    "valtio": "^2.1.4",
+    "websocket": "^1.0.34"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4.1.4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/websocket": "^1.0.10",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.1",
+    "tailwindcss": "^4.1.4",
+    "typescript": "^5"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+}

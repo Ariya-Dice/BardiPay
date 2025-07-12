@@ -1,0 +1,56 @@
+.particleContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1; /* ذرات زیر محتوا */
+}
+
+/* تعریف رنگ‌های مختلف برای ذرات */
+.sparkleParticle {
+  position: absolute;
+  background: var(--particle-color, rgba(255, 255, 255, 0.8)); /* رنگ پیش‌فرض */
+  border-radius: 50%;
+  filter: blur(var(--blur));
+  left: var(--start-x);
+  top: var(--start-y);
+  width: var(--size);
+  height: var(--size);
+  animation-name: float;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+/* تعریف رنگ‌ها برای ذرات مختلف */
+.sparkleParticle:nth-child(4n + 1) {
+  --particle-color: rgba(100, 149, 237, 0.8); /* آبی روشن */
+}
+
+.sparkleParticle:nth-child(4n + 2) {
+  --particle-color: rgba(255, 105, 180, 0.8); /* صورتی */
+}
+
+.sparkleParticle:nth-child(4n + 3) {
+  --particle-color: rgba(50, 205, 50, 0.8); /* سبز روشن */
+}
+
+.sparkleParticle:nth-child(4n + 4) {
+  --particle-color: rgba(255, 215, 0, 0.8); /* زرد طلایی */
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(var(--move-x), var(--move-y));
+    opacity: 0.4;
+  }
+  100% {
+    transform: translate(calc(var(--move-x) * -1), calc(var(--move-y) * -1));
+    opacity: 0.8;
+  }
+}

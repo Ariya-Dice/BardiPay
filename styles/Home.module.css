@@ -1,0 +1,87 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  color: #ffffff;
+  position: relative;
+  z-index: 1;
+  overflow: auto;
+  background-color: transparent;
+}
+
+.innerContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  background-color: transparent;
+}
+
+.title {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #ffffff;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.7);
+}
+
+.description {
+  font-size: 1.2rem;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto 30px;
+  color: #cccccc;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.7);
+}
+
+.howItWorksContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  transition: opacity 0.2s;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.7);
+  background-color: transparent; /* No background */
+}
+
+.button:hover {
+  opacity: 0.8;
+}
+
+.buttonIcon {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.sparkleParticles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}

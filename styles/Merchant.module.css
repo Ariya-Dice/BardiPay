@@ -1,0 +1,197 @@
+/* Container */
+.container {
+  padding: 20px;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+  position: relative;
+  min-height: 100vh;
+  background: transparent;
+  color: #ffffff;
+  overflow: auto;
+}
+.walletLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* اینم اضافه بشه */
+  gap: 10px;
+}
+.content {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.inputError {
+  border: 1px solid #ff4d4f; /* Red border for error */
+  background-color: #fff1f0; /* Light pink background for error */
+  animation: shake 0.4s ease-in-out;
+}
+
+/* Error Message */
+.errorMessage {
+  position: static;
+  margin-top: 5px;
+  font-size: 0.6rem;
+  color: #ff4d4f;
+  text-align: center;
+}
+
+/* Animation for error */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+/* Currency Select */
+.currencySelect {
+  padding: 8px;
+  border: 1px solid #555555;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #1a1a1a;
+  color: #ffffff;
+  width: 100%;
+  max-width: 220px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Submit Button */
+.submitButton {
+  display: inline-block;
+  padding: 12px 24px;
+  background: #1a1a1a;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 12px 50px rgba(0, 112, 243, 0.3);
+  width: max-content;
+  margin: 20px auto;
+  min-width: 300px; /* Adjusted for mobile */
+}
+
+.submitButton:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 12px 50px rgba(106, 17, 203, 0.6);
+}
+
+.submitButton:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px rgba(106, 17, 203, 0.3);
+}
+
+.submitButton:disabled {
+  background: #555555;
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Search Button */
+.searchButton {
+  padding: 10px 20px;
+  cursor: pointer;
+  background: #1a1a1a;
+  color: #f1f1f1;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-top: 10px;
+}
+
+.searchButton:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(106, 17, 203, 0.4);
+}
+
+/* Event Log Section */
+.eventLogSection {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: transparent;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Result Section */
+.resultSection {
+  max-width: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin: 0 auto;
+  min-height: 30vh;
+  background: transparent;
+}
+
+/* Scrollbar Styles */
+.scrollContainer::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  backdrop-filter: blur(10px);
+}
+
+.scrollContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .walletSection {
+    max-width: 95%;
+    padding: 15px;
+  }
+
+  .submitButton {
+    min-width: 250px; /* Adjusted for mobile */
+    padding: 10px 20px;
+  }
+
+  .resultSection {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  .walletSectionTitle {
+    font-size: 1.7rem;
+  }
+
+  .errorMessage {
+    font-size: 0.7rem;
+  }
+
+  .submitButton {
+    min-width: 200px;
+    font-size: 0.9rem;
+    padding: 8px 16px;
+  }
+
+  .searchButton {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+}
