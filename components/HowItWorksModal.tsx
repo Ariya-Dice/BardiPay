@@ -54,8 +54,9 @@ export default function HowItWorksModal() {
                     How DayPay Works
                   </Dialog.Title>
                   <div className="mt-4 text-gray-600">
+                    {/* === تغییر ۳: پاراگراف اول با تأکید بر عدم ذخیره داده === */}
                     <p className="mb-4">
-                      <strong>DayPay</strong> is a decentralized payment platform that enables secure and seamless transactions using 20 top cryptocurrencies, including Bitcoin, Ethereum, BNB, Solana, and Tron. It operates locally on your device, ensuring maximum privacy and security with no data storage.
+                      <strong>DayPay</strong> is a truly decentralized payment tool that enables secure and anonymous transactions. It runs <strong>entirely in your browser</strong> and never stores your data on any server. We don't know who you are, and we don't track your payments. Your privacy is guaranteed.
                     </p>
 
                     <h4 className="text-lg font-semibold mt-6">For Sellers</h4>
@@ -74,16 +75,21 @@ export default function HowItWorksModal() {
                       <li>Wallet connection disconnects after 5 minutes or payment completion for enhanced security.</li>
                     </ul>
 
+                    {/* === تغییر ۴: بخش "چرا DayPay" با تأکید بر مزایای کلیدی === */}
                     <h4 className="text-lg font-semibold mt-6">Why Choose DayPay?</h4>
-                    <p className="mb-4">
-                      DayPay is designed for simplicity, security, and decentralization. Built with Next.js for a smooth user experience, WalletConnect for secure wallet integration, and smart contracts (in development) for stablecoin conversions, it’s tested on testnets to ensure reliability. Whether you’re a buyer or seller, DayPay makes crypto payments fast and easy.
-                    </p>
+                    <ul className="list-disc pl-5 mb-4 space-y-2">
+                        <li><strong>True Anonymity:</strong> No sign-up, no KYC, no accounts. We never ask for your data.</li>
+                        <li><strong>Server-less by Design:</strong> Everything happens locally on your device. We don't have servers that store your transaction history.</li>
+                        <li><strong>Complete Control:</strong> As a non-custodial tool, your funds go directly from wallet to wallet. You always control your keys.</li>
+                        <li><strong>Unmatched Simplicity:</strong> A clean, fast interface designed to get the job done without any hassle.</li>
+                    </ul>
 
                     <h4 className="text-lg font-semibold mt-6">Get Started</h4>
                     <p>
                       <strong>Sellers:</strong> Open the seller panel, input your wallet address and price, and share the generated QR code.<br />
                       <strong>Buyers:</strong> Open the buyer panel, scan the QR code, connect your wallet, and confirm the payment.<br />
-                      Start using DayPay today for secure and decentralized crypto payments!
+                      {/* === تغییر ۵: جمله پایانی قدرتمندتر === */}
+                      Start using DayPay today for truly private and censorship-resistant crypto payments!
                     </p>
                   </div>
 
