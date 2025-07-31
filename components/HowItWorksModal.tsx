@@ -54,9 +54,9 @@ export default function HowItWorksModal() {
                     How DayPay Works
                   </Dialog.Title>
                   <div className="mt-4 text-gray-600">
-                    {/* === تغییر ۳: پاراگراف اول با تأکید بر عدم ذخیره داده === */}
+                    {/* === FIX: Replaced ' with &apos; to fix ESLint error === */}
                     <p className="mb-4">
-                      <strong>DayPay</strong> is a truly decentralized payment tool that enables secure and anonymous transactions. It runs <strong>entirely in your browser</strong> and never stores your data on any server. We don't know who you are, and we don't track your payments. Your privacy is guaranteed.
+                      <strong>DayPay</strong> is a truly decentralized payment tool that enables secure and anonymous transactions. It runs <strong>entirely in your browser</strong> and never stores your data on any server. We don&apos;t know who you are, and we don&apos;t track your payments. Your privacy is guaranteed.
                     </p>
 
                     <h4 className="text-lg font-semibold mt-6">For Sellers</h4>
@@ -75,11 +75,10 @@ export default function HowItWorksModal() {
                       <li>Wallet connection disconnects after 5 minutes or payment completion for enhanced security.</li>
                     </ul>
 
-                    {/* === تغییر ۴: بخش "چرا DayPay" با تأکید بر مزایای کلیدی === */}
                     <h4 className="text-lg font-semibold mt-6">Why Choose DayPay?</h4>
                     <ul className="list-disc pl-5 mb-4 space-y-2">
                         <li><strong>True Anonymity:</strong> No sign-up, no KYC, no accounts. We never ask for your data.</li>
-                        <li><strong>Server-less by Design:</strong> Everything happens locally on your device. We don't have servers that store your transaction history.</li>
+                        <li><strong>Server-less by Design:</strong> Everything happens locally on your device. We don&apos;t have servers that store your transaction history.</li>
                         <li><strong>Complete Control:</strong> As a non-custodial tool, your funds go directly from wallet to wallet. You always control your keys.</li>
                         <li><strong>Unmatched Simplicity:</strong> A clean, fast interface designed to get the job done without any hassle.</li>
                     </ul>
@@ -88,7 +87,6 @@ export default function HowItWorksModal() {
                     <p>
                       <strong>Sellers:</strong> Open the seller panel, input your wallet address and price, and share the generated QR code.<br />
                       <strong>Buyers:</strong> Open the buyer panel, scan the QR code, connect your wallet, and confirm the payment.<br />
-                      {/* === تغییر ۵: جمله پایانی قدرتمندتر === */}
                       Start using DayPay today for truly private and censorship-resistant crypto payments!
                     </p>
                   </div>
