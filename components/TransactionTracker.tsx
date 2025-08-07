@@ -7,6 +7,7 @@ import { EventData, SearchResult, Wallets } from '../types';
 interface TransactionTrackerProps {
   wallets: Wallets;
   network: string;
+  // This function should be memoized with useCallback in the parent component
   setError: (error: string | null) => void;
 }
 
@@ -14,10 +15,11 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
   const [events, setEvents] = useState<EventData[]>([]);
   const [searchInvoiceId, setSearchInvoiceId] = useState<string>('');
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
-  const [error, setErrorState] = useState<string | null>(null); // اینجا state برای error ایجاد می‌کنیم
+  const [isSearching, setIsSearching] = useState<boolean>(false);
   const eventListenerRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
+    // Clean up the previous listener if it exists
     if (eventListenerRef.current) {
       eventListenerRef.current();
       eventListenerRef.current = null;
@@ -25,39 +27,55 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
 
     const onEvent = (event: EventData) => {
       setEvents((prev) => {
-        const e = [...prev, { ...event, timestamp: Date.now() }];
-        return e.slice(-10);
+        // Create a new array with the new event and keep the last 10 items
+        const newEvents = [...prev, { ...event, timestamp: Date.now() }];
+        return newEvents.slice(-10);
       });
     };
 
     try {
+      // Set up the new event listener and store its cleanup function
       const cleanup = listenToEvents(wallets, onEvent);
       eventListenerRef.current = cleanup;
     } catch (err) {
-      setErrorState('Failed to initialize event listener: ' + (err as Error).message); // استفاده از setErrorState
+      // Report initialization errors to the parent component
+      setError('Failed to initialize event listener: ' + (err as Error).message);
     }
 
+    // Return the cleanup function to be called on component unmount or when dependencies change
     return () => {
       if (eventListenerRef.current) {
         eventListenerRef.current();
         eventListenerRef.current = null;
       }
     };
-  }, [wallets, setError]);
+    // It's important that the parent component wraps the `setError` function in `useCallback`
+    // to prevent this effect from re-running unnecessarily on every parent render.
+  }, [wallets, network, setError]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!searchInvoiceId) {
+      setError('Please enter an invoice ID');
+      return;
+    }
+
+    setIsSearching(true);
+    setError(null); // Clear previous errors before a new search
+    setSearchResult(null); // Clear previous results
+
     try {
-      if (!searchInvoiceId) {
-        setErrorState('Please enter an invoice ID'); // استفاده از setErrorState
-        return;
-      }
       const tx = await searchTransaction(searchInvoiceId, wallets, network);
       setSearchResult(tx);
-      setErrorState(null); // تنظیم خطا به null
+      setSearchInvoiceId(''); // Clear input on successful search
     } catch (err) {
-      setErrorState('Error searching for transaction: ' + (err as Error).message); // استفاده از setErrorState
+      // Report search errors to the parent component
+      setError('Error searching for transaction: ' + (err as Error).message);
       setSearchResult(null);
+    } finally {
+      // Ensure loading state is turned off regardless of success or failure
+      setIsSearching(false);
     }
   };
 
@@ -70,7 +88,8 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
         ) : (
           <ul className={styles.eventList}>
             {events.map((ev) => (
-              <li key={ev.txHash} className={styles.eventItem}>
+              // Using a more unique key by combining txHash and timestamp
+              <li key={`${ev.txHash}-${ev.timestamp}`} className={styles.eventItem}>
                 <p>Token: {ev.token}</p>
                 <p>Amount: {ev.amount} {ev.token}</p>
                 <p>From: {ev.from}</p>
@@ -109,12 +128,16 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
             onChange={(e) => setSearchInvoiceId(e.target.value)}
             placeholder="Enter Invoice ID"
             className={styles.searchInput}
+            disabled={isSearching}
           />
-          <button type="submit" className={styles.searchButton}>Search</button>
+          <button type="submit" className={styles.searchButton} disabled={isSearching}>
+            {isSearching ? 'Searching...' : 'Search'}
+          </button>
         </form>
 
-        {/* نمایش خطا در صورت وجود */}
-        {error && <p className={styles.searchError}>{error}</p>}
+        {/* Error display is now handled by the parent component, 
+          which receives the error message via the `setError` prop.
+        */}
 
         {searchResult && (
           <div className={styles.searchResultSection}>
