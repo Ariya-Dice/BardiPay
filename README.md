@@ -1,40 +1,121 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# 💸 DayPay – Decentralized Serverless Payment Gateway for Hyperliquid
 
-## Getting Started
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Hackathon](https://img.shields.io/badge/Hyperliquid-Hackathon-FF69B4.svg)](https://taikai.network)
 
-First, run the development server:
+**DayPay** is a decentralized, non-custodial, and serverless crypto payment gateway built on **Hyperliquid**. It enables users and merchants to receive payments in stablecoins with zero backend, minimal setup, and full self-sovereignty.
 
-```bash
+---
+
+## 🚀 Why DayPay?
+
+Most crypto payment solutions today either require centralized APIs, backend servers, or custodial wallets.
+
+**DayPay** flips that model by:
+- Removing the need for any backend
+- Providing direct, secure, and permissionless payment infrastructure
+- Empowering merchants with a plug-and-play payment button
+- Built entirely on **Hyperliquid + HyperEVM**
+
+---
+
+## ✨ Key Features
+
+- 🧩 **No Backend Required** – Works entirely client-side
+- 🔐 **Non-Custodial** – Payments go directly to the merchant's wallet
+- 💵 **Stablecoin Support** – Accept payments in USDC, USDT, or other Hyperliquid tokens
+- ⚙️ **Customizable Payment Button** – Add a DayPay button to any site or dApp
+- 📈 **Merchant Dashboard** – View payment history, totals, and status
+- 📡 **Notifications** – Get notified when a payment is received (using Node Info API)
+- 🗓️ **Optional Vesting** – Create recurring/subscription-based payment flows
+
+---
+
+## 🛠️ Built For
+
+> **Hyperliquid Frontier Track** of Hyperliquid Community Hackathon  
+> Also eligible for bounties:
+> - HyperEVM Transaction Simulator – $30,000  
+> - Token Vesting System – $5,000  
+> - Notification System using Node Info API – $3,000  
+> - Stablecoin Tracking Dashboard – $2,500  
+
+---
+
+## 🧱 Tech Stack
+
+| Layer       | Tech                                      |
+|-------------|-------------------------------------------|
+| Smart Contract | Solidity (HyperEVM compatible)        |
+| Frontend    | React + Next.js + TypeScript + Tailwind   |
+| Web3        | ethers.js + viem + WalletConnect/MetaMask |
+| Hosting     | Vercel (serverless)                       |
+| Storage     | IPFS (optional for metadata)              |
+
+---
+
+## 📦 SDK Usage
+
+```ts
+import { DayPayButton } from 'daypay-sdk';
+
+<DayPayButton
+  amount="25"
+  currency="USDC"
+  recipient="0xMerchantAddress"
+  onSuccess={() => alert("Payment successful!")}
+  metadata={{ orderId: "ORD-1234" }}
+/>
+🔧 How to Run Locally
+bash
+Copy
+Edit
+git clone https://github.com/your-org/daypay.git
+cd daypay
+
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Visit http://localhost:3000
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+🔐 Smart Contract
+Contract source is in /contracts/DayPay.sol.
+Compiled and deployed using Foundry + HyperEVM CLI.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+Functions:
+pay(recipient, token, amount, metadata)
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+subscribe(recipient, token, amount, interval)
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+getPayments(address) – view past transactions
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+🖼️ Screenshots
+Payment Button	Merchant Dashboard
 
-## Learn More
+📅 Hackathon Timeline
+🛫 Kickoff: July 28
 
-To learn more about Next.js, take a look at the following resources:
+🛠️ Build Weeks: August 4 – August 22
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+📤 Submission Deadline: August 24
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+🏆 Winners Announced: September 5
 
-## Deploy on Vercel
+💬 Contact & Support
+Discord: @AriyaKhan
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Email: abdollahiyansaeed@gmail.com
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+GitHub: github.com/Ariya-Dice
+
+📄 License
+This project is licensed under the MIT License – see the LICENSE file for details.
+
+🙏 Acknowledgements
+Hyperliquid Team
+
+Hackathon Judges & Growth Partners
+
+Open Source Contributors
