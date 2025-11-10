@@ -8,17 +8,19 @@ import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } f
 import { getOrCreateAssociatedTokenAccount, createTransferCheckedInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { createTransaction } from '../modules/transactionCreator'; // Assuming this module handles EVM transactions
 import dynamic from 'next/dynamic';
-import styles from '../pages/Buyer.module.css'; // Assuming this path is correct
+import styles from '../styles/Buyer.module.css'; // Correct path to styles
 
 // Dynamically import TronWeb, only on client-side
-const TronWeb = dynamic(() => import('tronweb'), { ssr: false });
+// Removed unused TronWeb dynamic import; using window.tronWeb from TronLink
 
 // Define network configurations for easy management
 const EVM_NETWORKS = {
   1: {
     chainId: '0x1',
     chainName: 'Ethereum Mainnet',
-    rpcUrls: ['https://eth-mainnet.g.alchemy.com/v2/YOUR_ALCHEMY_API_KEY'], // Placeholder: Replace with actual Alchemy key
+    rpcUrls: [
+      process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL || 'https://cloudflare-eth.com',
+    ],
     nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
     blockExplorerUrls: ['https://etherscan.io'],
   },
@@ -309,20 +311,6 @@ const WalletConnection = ({ paymentInfo }) => {
       setError("Wallet disconnected due to 5 minutes of inactivity.");
     }, IDLE_TIME);
     idleTimeoutRef.current = timeoutId;
-
-    // Use named functions for event listeners to ensure proper removal
-    const resetTimer = () => {
-      clearIdleTimer();
-      const newTimeoutId = setTimeout(() => {
-        disconnectWallet();
-        setError("Wallet disconnected due to 5 minutes of inactivity.");
-      }, IDLE_TIME);
-      idleTimeoutRef.current = newTimeoutId;
-    };
-
-    window.addEventListener("click", resetTimer, { passive: true });
-    window.addEventListener("mousemove", resetTimer, { passive: true });
-    window.addEventListener("keypress", resetTimer, { passive: true });
   }, [disconnectWallet]);
 
   /**
@@ -332,14 +320,8 @@ const WalletConnection = ({ paymentInfo }) => {
     if (idleTimeoutRef.current) {
       clearTimeout(idleTimeoutRef.current);
       idleTimeoutRef.current = null;
-      // Remove event listeners properly
-      window.removeEventListener("click", () => startIdleTimer()); // Note: this will re-add a new listener each time
-      window.removeEventListener("mousemove", () => startIdleTimer());
-      window.removeEventListener("keypress", () => startIdleTimer());
-      // The issue is with removing anonymous functions. Store them outside if needed.
-      // For a proper solution, define resetTimer outside `startIdleTimer` and pass it.
     }
-  }, [startIdleTimer]); // Dependency on startIdleTimer itself can lead to infinite loop if not careful.
+  }, [startIdleTimer]);
 
   // Refined approach for event listeners for idle timer:
   const idleTimerResetHandler = useCallback(() => {

@@ -23,7 +23,9 @@ export const searchTransaction = async (invoiceId, merchantAddress, network) => 
     );
 
     const filter = contract.filters.Transfer(null, merchantAddress);
-    const events = await contract.queryFilter(filter, -1000); // 1000 بلاک آخر
+    const latestBlock = await provider.getBlockNumber();
+    const fromBlock = Math.max(0, latestBlock - 1000);
+    const events = await contract.queryFilter(filter, fromBlock, latestBlock);
     for (const event of events) {
       const tx = await provider.getTransaction(event.transactionHash);
       let txInvoiceId = null;
@@ -48,10 +50,10 @@ export const searchTransaction = async (invoiceId, merchantAddress, network) => 
 
   // سرچ برای ETH/BNB
   const latestBlock = await provider.getBlockNumber();
-  for (let i = latestBlock - 1000; i <= latestBlock; i++) {
-    const block = await provider.getBlock(i, true);
-    for (const txHash of block.transactions) {
-      const tx = await provider.getTransaction(txHash);
+  const fromBlock = Math.max(0, latestBlock - 1000);
+  for (let i = fromBlock; i <= latestBlock; i++) {
+    const block = await provider.getBlockWithTransactions(i);
+    for (const tx of block.transactions) {
       if (
         tx.to &&
         tx.to.toLowerCase() === merchantAddress.toLowerCase() &&
@@ -70,7 +72,7 @@ export const searchTransaction = async (invoiceId, merchantAddress, network) => 
             from: tx.from,
             to: tx.to,
             invoiceId,
-            txHash,
+            txHash: tx.hash,
             network,
           };
         }

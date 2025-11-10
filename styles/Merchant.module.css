@@ -97,6 +97,13 @@
   box-shadow: none;
 }
 
+.amountContainer {
+  border: 1px solid #555;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 15px;
+  background: rgba(0, 0, 0, 0.2);
+}
 /* Search Button */
 .searchButton {
   padding: 10px 20px;

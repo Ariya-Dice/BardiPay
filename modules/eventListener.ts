@@ -7,8 +7,9 @@ const tokenAddresses = {
 };
 
 const providerUrls = {
-  ethereum: 'wss://eth-mainnet.g.alchemy.com/v2/YOUR_KEY_HERE',
-  solana: 'wss://api.mainnet-beta.solana.com',
+  ethereum:
+    (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ETHEREUM_WS_URL) ||
+    'wss://eth-mainnet.g.alchemy.com/v2/demo',
 };
 
 export const listenToEvents = (
@@ -17,7 +18,8 @@ export const listenToEvents = (
 ) => {
   const cleanups: (() => void)[] = [];
 
-  const networks = ['ethereum', 'solana'];
+  // Limit to Ethereum for reliability; Solana listener disabled until a robust impl is added
+  const networks = ['ethereum'];
 
   networks.forEach((network) => {
     if (!wallets[network as keyof Wallets]?.trim()) return;
@@ -91,65 +93,7 @@ export const listenToEvents = (
       });
     }
 
-    else if (network === 'solana') {
-      const ws = new w3cwebsocket(providerUrls.solana);
-
-      const subscription = {
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'accountSubscribe',
-        params: [wallets.solana, { commitment: 'confirmed', encoding: 'base64' }],
-      };
-
-      ws.onopen = () => {
-        ws.send(JSON.stringify(subscription));
-      };
-
-      ws.onmessage = async (message) => {
-        try {
-          const data = JSON.parse(message.data.toString());
-          if (data.method === 'accountNotification') {
-            const sig = data.params.result?.context?.slot;
-            if (!sig) return;
-
-            const response = await fetch(`https://api.mainnet-beta.solana.com`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                jsonrpc: '2.0',
-                id: 1,
-                method: 'getConfirmedTransaction',
-                params: [sig],
-              }),
-            });
-
-            const tx = await response.json();
-            const amount = tx.result?.meta?.postBalances?.[0] / 1e9;
-
-            callback({
-              token: 'SOL',
-              amount: amount?.toString() ?? '0',
-              from: tx.result.transaction.message.accountKeys[0].pubkey,
-              to: wallets.solana!,
-              invoiceId: null,
-              txHash: sig,
-              network,
-              timestamp: Date.now(), // استفاده از زمان به میلی‌ثانیه
-            });
-          }
-        } catch (error) {
-          console.error('Error processing Solana transaction:', error);
-        }
-      };
-
-      ws.onerror = (error) => {
-        console.error('Solana WebSocket error:', error);
-      };
-
-      cleanups.push(() => {
-        ws.close();
-      });
-    }
+    // Solana listener is currently disabled
   });
 
   return () => {

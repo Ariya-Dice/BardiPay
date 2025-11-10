@@ -26,3 +26,8 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* Limit caret (blinking text cursor) to actual form fields only */
+*:not(input):not(textarea):not(select) {
+  caret-color: transparent;
+}

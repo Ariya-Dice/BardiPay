@@ -7,6 +7,7 @@ import WalletManager from '../components/WalletManager';
 import InvoiceCreator from '../components/InvoiceCreator';
 import TransactionTracker from '../components/TransactionTracker';
 import { Wallets } from '../components/types';
+import { useEffect } from 'react';
 
 export default function Merchant() {
   const [wallets, setWallets] = useState<Wallets>({
@@ -22,10 +23,23 @@ export default function Merchant() {
     token: string;
     network: string;
     invoiceId: string;
-    qrCode: string;
+    qrCodeData: string;
     recipient: string;
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('merchantWallets');
+      if (saved) {
+        const parsed = JSON.parse(saved) as Wallets;
+        setWallets(prev => ({ ...prev, ...parsed }));
+      }
+    } catch (err) {
+      console.error('Failed to load wallets from localStorage:', err);
+      setError('Failed to load wallets from localStorage.');
+    }
+  }, []);
 
   const handleWalletChange = useCallback((network: keyof Wallets, address: string) => {
     const updated = { ...wallets };

@@ -1,10 +1,8 @@
-// components/WalletManager.tsx
-
 'use client';
 
 import { useState } from 'react';
 import CoinIcons from './CoinIcons';
-import { Wallets } from '../types'; // Corrected path
+import { Wallets } from './types';
 import { validateAddress } from '../components/validateAddress';
 import styles from '../styles/WalletManager.module.css';
 
@@ -15,14 +13,11 @@ interface WalletManagerProps {
 
 const networkDisplayNames: Record<keyof Wallets, string> = {
   ethereum: 'Ethereum',
-  bsc: 'BSC (BNB Smart Chain)',
+  bsc: 'BSC',
   tron: 'Tron',
   solana: 'Solana',
   bitcoin: 'Bitcoin',
 };
-
-// Define the order of networks for consistent processing
-const supportedNetworks = Object.keys(networkDisplayNames) as Array<keyof Wallets>;
 
 export default function WalletManager({ wallets, onWalletChange }: WalletManagerProps) {
   const [inputAddress, setInputAddress] = useState('');
@@ -30,10 +25,7 @@ export default function WalletManager({ wallets, onWalletChange }: WalletManager
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputAddress(e.target.value);
-    // Clear previous error on new input
-    if (validationError) {
-      setValidationError(null);
-    }
+    setValidationError(null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -46,40 +38,31 @@ export default function WalletManager({ wallets, onWalletChange }: WalletManager
       return;
     }
 
-    // Special handling for EVM chains (ETH/BSC) since they share the same address format
-    if (validateAddress('ethereum', value).isValid) {
-      onWalletChange('ethereum', value);
-      onWalletChange('bsc', value);
+    let detectedNetwork: keyof Wallets | null = null;
+    let validationSuccess = false;
+
+    for (const networkKey of Object.keys(wallets) as Array<keyof Wallets>) {
+      const validationResult = validateAddress(networkKey, value);
+      if (validationResult.isValid) {
+        detectedNetwork = networkKey;
+        validationSuccess = true;
+        break;
+      }
+    }
+
+    if (validationSuccess && detectedNetwork) {
+      onWalletChange(detectedNetwork, value);
+      if (detectedNetwork === 'ethereum') {
+        onWalletChange('bsc', value);
+      }
       setInputAddress('');
-      return; // Address added, exit
+    } else {
+      setValidationError('Invalid address format or unsupported network.');
     }
-
-    // Check other networks
-    for (const network of supportedNetworks) {
-      // Skip EVM chains as they are already handled above
-      if (network === 'ethereum' || network === 'bsc') {
-        continue;
-      }
-
-      if (validateAddress(network, value).isValid) {
-        onWalletChange(network, value);
-        setInputAddress('');
-        return; // Address added, exit
-      }
-    }
-
-    // If no validation passed for any network
-    setValidationError('Invalid address format or unsupported network.');
   };
 
   const handleRemove = (network: keyof Wallets) => {
-    // Since ETH and BSC addresses are linked in our logic, removing one should remove both.
-    if (network === 'ethereum' || network === 'bsc') {
-      onWalletChange('ethereum', '');
-      onWalletChange('bsc', '');
-    } else {
-      onWalletChange(network, '');
-    }
+    onWalletChange(network, '');
   };
 
   return (
@@ -101,30 +84,28 @@ export default function WalletManager({ wallets, onWalletChange }: WalletManager
 
       <CoinIcons wallets={wallets} />
 
-      {/* Render the list of saved wallets */}
-      {Object.values(wallets).some(address => !!address) && (
+      {Object.keys(wallets).some(key => wallets[key as keyof Wallets]) && (
         <div className={styles.savedWalletsSection}>
           <h4 className={styles.savedWalletsTitle}>Saved Wallets:</h4>
           <div className={styles.savedWalletsList}>
-            {supportedNetworks.map(coin => {
-              const addr = wallets[coin];
-              return addr ? (
+            {Object.entries(wallets).map(([coin, addr]) =>
+              addr ? (
                 <div key={coin} className={styles.walletItem}>
                   <strong className={styles.walletNetworkName}>
-                    {networkDisplayNames[coin] || coin}:
+                    {networkDisplayNames[coin as keyof Wallets] || coin}:
                   </strong>
-                  <span className={styles.walletAddress}>{addr}</span>
+                  {addr}
                   <button
                     type="button"
                     className={styles.removeButton}
-                    onClick={() => handleRemove(coin)}
+                    onClick={() => handleRemove(coin as keyof Wallets)}
                     aria-label={`Remove ${coin} wallet`}
                   >
-                    &times;
+                    ×
                   </button>
                 </div>
-              ) : null;
-            })}
+              ) : null
+            )}
           </div>
         </div>
       )}
