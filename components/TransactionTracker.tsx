@@ -1,22 +1,27 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from '../styles/Merchant.module.css';
 import { listenToEvents } from '../modules/eventListener';
-import { searchTransaction } from '../modules/transactionSearcher.js';
+import { searchTransaction } from '../modules/transactionSearcher';
 import { EventData, SearchResult, Wallets } from '../types';
 
 interface TransactionTrackerProps {
   wallets: Wallets;
-  network: string;
+  network: keyof Wallets | string;
   setError: (error: string | null) => void;
 }
 
-export default function TransactionTracker({ wallets, network, setError }: TransactionTrackerProps) {
+export default function TransactionTracker({
+  wallets,
+  network,
+  setError,
+}: TransactionTrackerProps) {
   const [events, setEvents] = useState<EventData[]>([]);
   const [searchInvoiceId, setSearchInvoiceId] = useState<string>('');
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
-  const [error, setErrorState] = useState<string | null>(null); // اینجا state برای error ایجاد می‌کنیم
+  const [error, setErrorState] = useState<string | null>(null);
   const eventListenerRef = useRef<(() => void) | null>(null);
 
+  // ---- Event listener ----
   useEffect(() => {
     if (eventListenerRef.current) {
       eventListenerRef.current();
@@ -25,8 +30,8 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
 
     const onEvent = (event: EventData) => {
       setEvents((prev) => {
-        const e = [...prev, { ...event, timestamp: Date.now() }];
-        return e.slice(-10);
+        const updated = [...prev, { ...event, timestamp: Date.now() }];
+        return updated.slice(-10); // فقط ۱۰ تراکنش اخیر
       });
     };
 
@@ -34,7 +39,13 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
       const cleanup = listenToEvents(wallets, onEvent);
       eventListenerRef.current = cleanup;
     } catch (err) {
-      setErrorState('Failed to initialize event listener: ' + (err as Error).message); // استفاده از setErrorState
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === 'string'
+          ? err
+          : 'Unknown error';
+      setErrorState('Failed to initialize event listener: ' + message);
     }
 
     return () => {
@@ -45,26 +56,60 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
     };
   }, [wallets, setError]);
 
-  const handleSearch = async (e: React.FormEvent) => {
+  // ---- Search handler ----
+  const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     try {
-      if (!searchInvoiceId) {
-        setErrorState('Please enter an invoice ID'); // استفاده از setErrorState
+      if (!searchInvoiceId.trim()) {
+        setErrorState('Please enter an invoice ID');
         return;
       }
+
+      const networkKey = network as keyof Wallets;
       const merchantAddress =
-        (wallets as any)[network as keyof Wallets] || wallets.ethereum || wallets.bsc || '';
+        wallets[networkKey] ||
+        wallets.ethereum ||
+        wallets.bsc ||
+        wallets.tron ||
+        wallets.solana ||
+        '';
+
+      if (!merchantAddress) {
+        setErrorState('No wallet address found for this network.');
+        return;
+      }
+
       const tx = await searchTransaction(searchInvoiceId, merchantAddress, network);
       setSearchResult(tx);
-      setErrorState(null); // تنظیم خطا به null
+      setErrorState(null);
     } catch (err) {
-      setErrorState('Error searching for transaction: ' + (err as Error).message); // استفاده از setErrorState
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === 'string'
+          ? err
+          : 'Unknown error';
+      setErrorState('Error searching for transaction: ' + message);
       setSearchResult(null);
     }
   };
 
+  // ---- Helper for explorer URL ----
+  const getExplorerUrl = (networkName: string, txHash: string): string => {
+    const explorers: Record<string, string> = {
+      ethereum: 'https://etherscan.io/tx/',
+      bsc: 'https://bscscan.com/tx/',
+      tron: 'https://tronscan.org/#/transaction/',
+      solana: 'https://solscan.io/tx/',
+      bitcoin: 'https://www.blockchain.com/btc/tx/',
+    };
+    return (explorers[networkName] || explorers.bitcoin) + txHash;
+  };
+
   return (
     <>
+      {/* ---- Event Log Section ---- */}
       <section className={styles.eventLogSection}>
         <h3 className={styles.eventLogTitle}>Transaction Event Log</h3>
         {events.length === 0 ? (
@@ -74,7 +119,9 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
             {events.map((ev) => (
               <li key={ev.txHash} className={styles.eventItem}>
                 <p>Token: {ev.token}</p>
-                <p>Amount: {ev.amount} {ev.token}</p>
+                <p>
+                  Amount: {ev.amount} {ev.token}
+                </p>
                 <p>From: {ev.from}</p>
                 <p>To: {ev.to}</p>
                 <p>Invoice ID: {ev.invoiceId || 'Unknown'}</p>
@@ -82,13 +129,7 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
                 <p>
                   Transaction:{' '}
                   <a
-                    href={`https://${
-                      ev.network === 'ethereum' ? 'etherscan.io' :
-                      ev.network === 'bsc' ? 'bscscan.com' :
-                      ev.network === 'tron' ? 'tronscan.org' :
-                      ev.network === 'solana' ? 'solscan.io' :
-                      'blockchain.com/btc'
-                    }/tx/${ev.txHash}`}
+                    href={getExplorerUrl(ev.network, ev.txHash)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={styles.eventLink}
@@ -102,6 +143,7 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
         )}
       </section>
 
+      {/* ---- Search Section ---- */}
       <section className={styles.searchSection}>
         <h3 className={styles.searchTitle}>Search Invoice</h3>
         <form onSubmit={handleSearch} className={styles.searchForm}>
@@ -112,17 +154,20 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
             placeholder="Enter Invoice ID"
             className={styles.searchInput}
           />
-          <button type="submit" className={styles.searchButton}>Search</button>
+          <button type="submit" className={styles.searchButton}>
+            Search
+          </button>
         </form>
 
-        {/* نمایش خطا در صورت وجود */}
         {error && <p className={styles.searchError}>{error}</p>}
 
         {searchResult && (
           <div className={styles.searchResultSection}>
             <h4 className={styles.searchResultTitle}>Transaction Found</h4>
             <p>Token: {searchResult.token}</p>
-            <p>Amount: {searchResult.amount} {searchResult.token}</p>
+            <p>
+              Amount: {searchResult.amount} {searchResult.token}
+            </p>
             <p>From: {searchResult.from}</p>
             <p>To: {searchResult.to}</p>
             <p>Invoice ID: {searchResult.invoiceId || 'Unknown'}</p>
@@ -130,13 +175,7 @@ export default function TransactionTracker({ wallets, network, setError }: Trans
             <p>
               Transaction:{' '}
               <a
-                href={`https://${
-                  searchResult.network === 'ethereum' ? 'etherscan.io' :
-                  searchResult.network === 'bsc' ? 'bscscan.com' :
-                  searchResult.network === 'tron' ? 'tronscan.org' :
-                  searchResult.network === 'solana' ? 'solscan.io' :
-                  'blockchain.com/btc'
-                }/tx/${searchResult.txHash}`}
+                href={getExplorerUrl(searchResult.network, searchResult.txHash)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.eventLink}
